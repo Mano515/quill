@@ -644,5 +644,43 @@ def from_word(
         raise typer.Exit(1)
 
 
+# ── Phase 8 — Signatures ───────────────────────────────────────────────────
+
+
+@app.command(name="sign")
+def sign_cmd(
+    input: Path = typer.Argument(..., help="PDF to sign"),
+    output: Path = typer.Option(..., "-o", "--output", help="Signed PDF"),
+    name: str = typer.Option(..., "--name", "-n", help="Signer name"),
+    reason: str = typer.Option("", "--reason", "-r", help="Reason / purpose"),
+    location: str = typer.Option("", "--location", "-l", help="Location"),
+    page: int = typer.Option(1, "--page", "-p", help="Page number (1-indexed)"),
+    x: float = typer.Option(50, "--x", help="X position in points"),
+    y: float = typer.Option(50, "--y", help="Y position in points"),
+) -> None:
+    """Add a visual signature stamp to a PDF."""
+    from quill.features.sign import sign_pdf
+
+    sign_pdf(input, output, name=name, reason=reason, location=location, page=page, x=x, y=y)
+    rprint(f"[green]✓[/green] Signed → {output}")
+
+
+@app.command(name="list-signatures")
+def list_signatures_cmd(
+    input: Path = typer.Argument(..., help="PDF to inspect"),
+) -> None:
+    """List signature annotations in a PDF."""
+    from quill.features.sign import list_signatures
+
+    sigs = list_signatures(input)
+    if not sigs:
+        rprint("[dim]No signature annotations found.[/dim]")
+        return
+    table = Table("Page", "Type", "Author", "Content")
+    for s in sigs:
+        table.add_row(str(s["page"]), s["type"], s["author"], s["content"][:60])
+    rprint(table)
+
+
 if __name__ == "__main__":
     app()

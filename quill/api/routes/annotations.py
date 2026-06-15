@@ -97,3 +97,25 @@ async def comment(
         out = tmp / "commented.pdf"
         add_comment(src, out, text, x, y, page, author)
         return pdf_response(out, "commented.pdf")
+
+
+@router.post("/add-image", summary="Embed an image onto PDF pages")
+async def add_image(
+    file: UploadFile = File(...),
+    image: UploadFile = File(...),
+    x: float = Form(50),
+    y: float = Form(50),
+    width: float = Form(100),
+    height: float = Form(100),
+    pages: str | None = Form(None),
+):
+    from quill.features.annotations import add_image as _add_img
+
+    with workdir() as tmp:
+        src = tmp / "input.pdf"
+        src.write_bytes(await file.read())
+        img_path = tmp / image.filename
+        img_path.write_bytes(await image.read())
+        out = tmp / "with_image.pdf"
+        _add_img(src, out, img_path, x, y, width, height, parse_pages(pages))
+        return pdf_response(out, "with_image.pdf")

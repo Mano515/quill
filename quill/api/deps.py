@@ -1,12 +1,11 @@
 """Shared utilities for API routes: temp file management, response helpers."""
 
 import tempfile
-import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
 from fastapi import HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 
 
 @contextmanager
@@ -16,20 +15,23 @@ def workdir():
         yield Path(tmp)
 
 
-def pdf_response(path: Path, filename: str) -> FileResponse:
-    return FileResponse(
-        path=str(path),
+def pdf_response(path: Path, filename: str) -> Response:
+    # Read bytes before the workdir context exits so the temp file is never
+    # accessed after cleanup (matters for TestClient and eager garbage collection).
+    data = path.read_bytes()
+    return Response(
+        content=data,
         media_type="application/pdf",
-        filename=filename,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 
-def file_response(path: Path, filename: str, media_type: str = "application/octet-stream") -> FileResponse:
-    return FileResponse(
-        path=str(path),
+def file_response(path: Path, filename: str, media_type: str = "application/octet-stream") -> Response:
+    data = path.read_bytes()
+    return Response(
+        content=data,
         media_type=media_type,
-        filename=filename,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

@@ -1,9 +1,9 @@
 """API routes — Phase 7: conversions."""
 
 from fastapi import APIRouter, File, Form, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
 
-from quill.api.deps import pdf_response, workdir
+from quill.api.deps import file_response, pdf_response, workdir
 
 router = APIRouter(prefix="/convert", tags=["Convert"])
 
@@ -28,7 +28,7 @@ async def to_images(
         with zipfile.ZipFile(zip_path, "w") as zf:
             for p in saved:
                 zf.write(p, p.name)
-        return FileResponse(str(zip_path), media_type="application/zip", filename="pages.zip")
+        return file_response(zip_path, "pages.zip", "application/zip")
 
 
 @router.post("/from-images", summary="Combine images into a PDF")
@@ -55,7 +55,7 @@ async def to_markdown(file: UploadFile = File(...)):
         src.write_bytes(await file.read())
         out = tmp / "doc.md"
         pdf_to_markdown(src, out)
-        return FileResponse(str(out), media_type="text/markdown", filename="doc.md")
+        return file_response(out, "doc.md", "text/markdown")
 
 
 @router.post("/to-json", summary="Convert PDF text layout to JSON")

@@ -117,4 +117,4 @@ async def info(file: UploadFile = File(...)) -> JSONResponse:
         src = tmp / "input.pdf"
         src.write_bytes(await file.read())
         meta = get_metadata(src)
-        return JSONResponse({k: str(v) if v is not None else None for k, v in meta.items()})
+        return JSONResponse(meta)
