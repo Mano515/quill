@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quill — PDF Editor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #6c63ff;
+      --accent-hover: #8880ff;
+      --text: #e2e4f0;
+      --text-dim: #7b7f9e;
+      --success: #4ade80;
+      --error: #f87171;
+      --radius: 10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+    }
+
+    header svg { color: var(--accent); }
+    header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+    header span { color: var(--text-dim); font-size: 13px; margin-left: auto; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      height: calc(100vh - 57px);
+    }
+
+    nav {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+      overflow-y: auto;
+    }
+
+    nav .group-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 12px 20px 6px;
+    }
+
+    nav button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      padding: 8px 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    nav button:hover { color: var(--text); background: var(--surface2); }
+    nav button.active { color: var(--accent); border-left-color: var(--accent); background: var(--surface2); }
+
+    main {
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .desc {
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+      max-width: 560px;
+    }
+
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-dim); }
+    label strong { color: var(--text); font-size: 13px; }
+
+    input[type="file"],
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    input[type="file"] { cursor: pointer; }
+    input[type="file"]::file-selector-button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 10px;
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    button.submit {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      width: fit-content;
+    }
+
+    button.submit:hover { background: var(--accent-hover); }
+    button.submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      display: none;
+    }
+
+    .result.success {
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.25);
+      color: var(--success);
+      display: block;
+    }
+
+    .result.error {
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+      color: var(--error);
+      display: block;
+    }
+
+    .result a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .result a:hover { text-decoration: underline; }
+
+    .json-result {
+      margin-top: 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+      color: var(--text-dim);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tag {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+  </svg>
+  <h1>Quill</h1>
+  <span>PDF Editor &amp; Processor</span>
+</header>
+
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const PANELS = [
+  {
+    group: "Basique",
+    items: [
+      {
+        id: "merge", label: "Fusionner", desc: "Combiner plusieurs PDFs en un seul.",
+        endpoint: "/basic/merge", method: "POST", responseType: "blob",
+        fields: [{ name: "files", label: "Fichiers PDF", type: "file", multiple: true, accept: ".pdf" }],
+        downloadName: "merged.pdf",
+      },
+      {
+        id: "split", label: "Diviser", desc: "Découper un PDF en plusieurs fichiers.",
+        endpoint: "/basic/split", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "ranges", label: "Plages de pages (optionnel)", type: "text", placeholder: "ex: 1-3,5-7" },
+        ],
+        downloadName: "split.zip",
+      },
+      {
+        id: "rotate", label: "Rotation", desc: "Faire pivoter des pages.",
+        endpoint: "/basic/rotate", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "degrees", label: "Degrés", type: "select", options: ["90","180","270"] },
+          { name: "pages", label: "Pages (optionnel)", type: "text", placeholder: "ex: 1,3,5" },
+        ],
+        downloadName: "rotated.pdf",
+      },
+      {
+        id: "delete-pages", label: "Supprimer pages", desc: "Retirer des pages du document.",
+        endpoint: "/basic/delete-pages", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "pages", label: "Pages à supprimer", type: "text", placeholder: "ex: 2,4,6" },
+        ],
+        downloadName: "output.pdf",
+      },
+      {
+        id: "info", label: "Métadonnées", desc: "Lire les informations d'un PDF.",
+        endpoint: "/basic/info", method: "POST", responseType: "json",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+      },
+      {
+        id: "extract-text", label: "Extraire texte", desc: "Extraire le texte brut d'un PDF.",
+        endpoint: "/basic/extract-text", method: "POST", responseType: "json",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "pages", label: "Pages (optionnel)", type: "text", placeholder: "ex: 1,2" },
+        ],
+      },
+    ],
+  },
+  {
+    group: "Sécurité",
+    items: [
+      {
+        id: "encrypt", label: "Chiffrer", desc: "Protéger un PDF par mot de passe.",
+        endpoint: "/security/encrypt", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "password", label: "Mot de passe", type: "text", placeholder: "••••••••" },
+        ],
+        downloadName: "encrypted.pdf",
+      },
+      {
+        id: "decrypt", label: "Déchiffrer", desc: "Retirer la protection d'un PDF.",
+        endpoint: "/security/decrypt", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "password", label: "Mot de passe", type: "text", placeholder: "••••••••" },
+        ],
+        downloadName: "decrypted.pdf",
+      },
+    ],
+  },
+  {
+    group: "Annotations",
+    items: [
+      {
+        id: "watermark", label: "Filigrane", desc: "Ajouter un filigrane textuel diagonal.",
+        endpoint: "/annotations/watermark", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "text", label: "Texte du filigrane", type: "text", placeholder: "CONFIDENTIEL" },
+          { name: "opacity", label: "Opacité (0–1)", type: "text", placeholder: "0.15" },
+          { name: "angle", label: "Angle (degrés)", type: "text", placeholder: "45" },
+        ],
+        downloadName: "watermarked.pdf",
+      },
+      {
+        id: "stamp", label: "Tampon", desc: "Apposer un tampon (APPROUVÉ, BROUILLON…).",
+        endpoint: "/annotations/stamp", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "label", label: "Texte du tampon", type: "text", placeholder: "CONFIDENTIEL" },
+          { name: "pages", label: "Pages (optionnel)", type: "text", placeholder: "1,2" },
+        ],
+        downloadName: "stamped.pdf",
+      },
+      {
+        id: "add-text", label: "Ajouter texte", desc: "Insérer du texte libre à une position.",
+        endpoint: "/annotations/add-text", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "text", label: "Texte", type: "text", placeholder: "Mon annotation" },
+          { name: "x", label: "Position X (pt)", type: "text", placeholder: "50" },
+          { name: "y", label: "Position Y (pt)", type: "text", placeholder: "100" },
+          { name: "pages", label: "Pages (optionnel)", type: "text", placeholder: "1,3" },
+        ],
+        downloadName: "annotated.pdf",
+      },
+      {
+        id: "page-numbers", label: "Numéroter pages", desc: "Ajouter la numérotation automatique.",
+        endpoint: "/annotations/page-numbers", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "position", label: "Position", type: "select", options: ["bottom-center","bottom-right","bottom-left","top-center","top-right","top-left"] },
+          { name: "prefix", label: "Préfixe", type: "text", placeholder: "Page " },
+          { name: "suffix", label: "Suffixe", type: "text", placeholder: "" },
+          { name: "start", label: "Numéro de départ", type: "text", placeholder: "1" },
+        ],
+        downloadName: "numbered.pdf",
+      },
+    ],
+  },
+  {
+    group: "Extraction",
+    items: [
+      {
+        id: "extract-tables", label: "Tableaux", desc: "Extraire les tableaux en CSV ou Excel.",
+        endpoint: "/extraction/tables", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "fmt", label: "Format", type: "select", options: ["csv","excel"] },
+          { name: "pages", label: "Pages (optionnel)", type: "text", placeholder: "1,3" },
+        ],
+        downloadName: "tables",
+      },
+      {
+        id: "extract-images-api", label: "Images", desc: "Extraire les images embarquées.",
+        endpoint: "/extraction/images", method: "POST", responseType: "blob",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+        downloadName: "images.zip",
+      },
+      {
+        id: "extract-links", label: "Liens", desc: "Lister tous les hyperliens.",
+        endpoint: "/extraction/links", method: "POST", responseType: "json",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+      },
+      {
+        id: "detect-lang", label: "Langue", desc: "Détecter la langue du document.",
+        endpoint: "/extraction/language", method: "POST", responseType: "json",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+      },
+    ],
+  },
+  {
+    group: "Formulaires",
+    items: [
+      {
+        id: "list-fields-api", label: "Lister champs", desc: "Afficher les champs interactifs d'un formulaire.",
+        endpoint: "/forms/list", method: "POST", responseType: "json",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+      },
+      {
+        id: "fill-form-api", label: "Remplir formulaire", desc: 'Remplir les champs (JSON {"champ":"valeur"}).',
+        endpoint: "/forms/fill", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "data", label: "Données (JSON)", type: "textarea", placeholder: '{"name": "Alice", "email": "alice@example.com"}' },
+        ],
+        downloadName: "filled.pdf",
+      },
+      {
+        id: "flatten-form-api", label: "Aplatir formulaire", desc: "Rendre les champs non éditables.",
+        endpoint: "/forms/flatten", method: "POST", responseType: "blob",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+        downloadName: "flattened.pdf",
+      },
+    ],
+  },
+  {
+    group: "Conversions",
+    items: [
+      {
+        id: "to-images-api", label: "PDF → Images", desc: "Convertir les pages en PNG ou JPEG.",
+        endpoint: "/convert/to-images", method: "POST", responseType: "blob",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "fmt", label: "Format", type: "select", options: ["png","jpg"] },
+          { name: "dpi", label: "DPI", type: "text", placeholder: "150" },
+        ],
+        downloadName: "pages.zip",
+      },
+      {
+        id: "from-images-api", label: "Images → PDF", desc: "Combiner des images en un seul PDF.",
+        endpoint: "/convert/from-images", method: "POST", responseType: "blob",
+        fields: [{ name: "files", label: "Images", type: "file", multiple: true, accept: "image/*" }],
+        downloadName: "combined.pdf",
+      },
+      {
+        id: "to-markdown-api", label: "PDF → Markdown", desc: "Convertir un PDF en Markdown.",
+        endpoint: "/convert/to-markdown", method: "POST", responseType: "blob",
+        fields: [{ name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" }],
+        downloadName: "doc.md",
+      },
+      {
+        id: "to-json-api", label: "PDF → JSON", desc: "Extraire la mise en page en JSON structuré.",
+        endpoint: "/convert/to-json", method: "POST", responseType: "json",
+        fields: [
+          { name: "file", label: "Fichier PDF", type: "file", accept: ".pdf" },
+          { name: "pages", label: "Pages (optionnel)", type: "text", placeholder: "1,2" },
+        ],
+      },
+    ],
+  },
+];
+
+// ── Build nav & panels ────────────────────────────────────────────────────
+
+const nav = document.getElementById('nav');
+const mainEl = document.getElementById('main');
+
+PANELS.forEach(group => {
+  const label = document.createElement('div');
+  label.className = 'group-label';
+  label.textContent = group.group;
+  nav.appendChild(label);
+
+  group.items.forEach(item => {
+    const btn = document.createElement('button');
+    btn.textContent = item.label;
+    btn.dataset.id = item.id;
+    btn.addEventListener('click', () => activate(item.id));
+    nav.appendChild(btn);
+
+    const panel = buildPanel(item);
+    panel.id = 'panel-' + item.id;
+    panel.className = 'panel';
+    mainEl.appendChild(panel);
+  });
+});
+
+function buildPanel(item) {
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <h2>${item.label}</h2>
+    <p class="desc">${item.desc}</p>
+    <form class="form-grid" id="form-${item.id}">
+      ${item.fields.map(f => fieldHTML(f)).join('')}
+      <button type="submit" class="submit">Lancer</button>
+    </form>
+    <div class="result" id="result-${item.id}"></div>
+    <pre class="json-result" id="json-${item.id}"></pre>
+  `;
+
+  div.querySelector('form').addEventListener('submit', e => {
+    e.preventDefault();
+    submitForm(item, div.querySelector('form'));
+  });
+
+  return div;
+}
+
+function fieldHTML(f) {
+  if (f.type === 'file') {
+    return `<label><strong>${f.label}</strong>
+      <input type="file" name="${f.name}" accept="${f.accept || ''}" ${f.multiple ? 'multiple' : ''} required />
+    </label>`;
+  }
+  if (f.type === 'select') {
+    const opts = f.options.map(o => `<option value="${o}">${o}</option>`).join('');
+    return `<label><strong>${f.label}</strong><select name="${f.name}">${opts}</select></label>`;
+  }
+  if (f.type === 'textarea') {
+    return `<label><strong>${f.label}</strong>
+      <textarea name="${f.name}" placeholder="${f.placeholder || ''}"></textarea>
+    </label>`;
+  }
+  return `<label><strong>${f.label}</strong>
+    <input type="text" name="${f.name}" placeholder="${f.placeholder || ''}" />
+  </label>`;
+}
+
+// ── Submit ────────────────────────────────────────────────────────────────
+
+async function submitForm(item, form) {
+  const btn = form.querySelector('button.submit');
+  const resultEl = document.getElementById('result-' + item.id);
+  const jsonEl = document.getElementById('json-' + item.id);
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Traitement…';
+  resultEl.className = 'result';
+  resultEl.textContent = '';
+  jsonEl.style.display = 'none';
+
+  try {
+    const fd = new FormData(form);
+    const resp = await fetch(item.endpoint, { method: 'POST', body: fd });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+      throw new Error(err.detail || resp.statusText);
+    }
+
+    if (item.responseType === 'blob') {
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const ct = resp.headers.get('content-type') || '';
+      const name = item.downloadName || 'output';
+      const ext = ct.includes('zip') ? '.zip' : ct.includes('json') ? '.json' : ct.includes('markdown') ? '.md' : name.includes('.') ? '' : '.pdf';
+      const filename = name.endsWith(ext) ? name : name + ext;
+      resultEl.innerHTML = `✓ Succès — <a href="${url}" download="${filename}">Télécharger ${filename}</a>`;
+      resultEl.className = 'result success';
+    } else {
+      const data = await resp.json();
+      jsonEl.textContent = JSON.stringify(data, null, 2);
+      jsonEl.style.display = 'block';
+      resultEl.textContent = '✓ Résultat ci-dessous';
+      resultEl.className = 'result success';
+    }
+  } catch (err) {
+    resultEl.textContent = '✗ Erreur : ' + err.message;
+    resultEl.className = 'result error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Lancer';
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────
+
+function activate(id) {
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`nav button[data-id="${id}"]`).classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+}
+
+// Activate first panel on load
+activate(PANELS[0].items[0].id);
+</script>
+</body>
+</html>

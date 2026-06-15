@@ -17,10 +17,14 @@ dependencies = [
     "langdetect>=1.0.9",
     "rich>=13.0.0",
     "typer>=0.12.0",
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.29.0",
+    "python-multipart>=0.0.9",
 ]
 
 [project.scripts]
 quill = "quill.cli:app"
+quill-server = "quill.server:main"
 
 [project.optional-dependencies]
 ocr = [
