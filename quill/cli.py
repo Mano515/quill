@@ -325,5 +325,150 @@ def comment(
     rprint(f"[green]✓[/green] Comment added → {output}")
 
 
+# ── Phase 4 — Extraction avancée ───────────────────────────────────────────
+
+
+@app.command(name="extract-tables")
+def extract_tables(
+    input: Path = typer.Argument(..., help="PDF to extract tables from"),
+    output: Optional[Path] = typer.Option(None, "-o", "--output", help="Output file (.csv or .xlsx)"),
+    pages: Optional[str] = typer.Option(None, "-p", "--pages", help="Pages e.g. '1,3'"),
+    fmt: str = typer.Option("csv", "--format", "-f", help="csv | excel"),
+) -> None:
+    """Extract tables from a PDF to CSV or Excel."""
+    from quill.features.extraction import extract_tables as _extract
+
+    page_list = [int(p) for p in pages.split(",")] if pages else None
+    results = _extract(input, output, page_list, fmt)
+
+    if not results:
+        rprint("[yellow]No tables found.[/yellow]")
+        return
+
+    rprint(f"[green]✓[/green] Found {len(results)} table(s)")
+    for r in results:
+        rows = len(r["data"])
+        cols = len(r["data"][0]) if r["data"] else 0
+        rprint(f"  Page {r['page']} · Table {r['table_index']} · {rows}×{cols}")
+
+
+@app.command(name="extract-images")
+def extract_images(
+    input: Path = typer.Argument(..., help="PDF to extract images from"),
+    output_dir: Path = typer.Option(Path("."), "-o", "--output-dir"),
+) -> None:
+    """Extract all embedded images from a PDF."""
+    from quill.features.extraction import extract_images as _extract
+
+    saved = _extract(input, output_dir)
+    rprint(f"[green]✓[/green] Extracted {len(saved)} image(s) → {output_dir}")
+    for p in saved:
+        rprint(f"  {p.name}")
+
+
+@app.command(name="extract-links")
+def extract_links(
+    input: Path = typer.Argument(..., help="PDF to extract links from"),
+    pages: Optional[str] = typer.Option(None, "-p", "--pages"),
+) -> None:
+    """Extract all hyperlinks from a PDF."""
+    from quill.features.extraction import extract_links as _extract
+    from rich.table import Table
+
+    page_list = [int(p) for p in pages.split(",")] if pages else None
+    links = _extract(input, page_list)
+
+    if not links:
+        rprint("[yellow]No links found.[/yellow]")
+        return
+
+    table = Table(show_header=True)
+    table.add_column("Page", style="cyan")
+    table.add_column("URL")
+    for link in links:
+        table.add_row(str(link["page"]), link["uri"])
+    rprint(table)
+
+
+@app.command(name="extract-fields")
+def extract_fields(
+    input: Path = typer.Argument(..., help="PDF with form fields"),
+) -> None:
+    """List all form fields and their values."""
+    from quill.features.extraction import extract_form_fields
+    from rich.table import Table
+
+    fields = extract_form_fields(input)
+    if not fields:
+        rprint("[yellow]No form fields found.[/yellow]")
+        return
+
+    table = Table(show_header=True)
+    table.add_column("Name", style="cyan")
+    table.add_column("Type")
+    table.add_column("Value")
+    for f in fields:
+        table.add_row(f["name"], f["type"], str(f["value"] or ""))
+    rprint(table)
+
+
+@app.command(name="detect-lang")
+def detect_lang(
+    input: Path = typer.Argument(..., help="PDF to analyse"),
+    pages: Optional[str] = typer.Option(None, "-p", "--pages"),
+) -> None:
+    """Detect the language of a PDF."""
+    from quill.features.extraction import detect_language
+
+    page_list = [int(p) for p in pages.split(",")] if pages else None
+    result = detect_language(input, page_list)
+    rprint(f"  [bold cyan]Language:[/bold cyan] {result['language']}")
+    rprint(f"  [bold cyan]Confidence:[/bold cyan] {result['confidence']:.1%}")
+    for page_num, lang in result["per_page"].items():
+        rprint(f"  Page {page_num}: {lang}")
+
+
+# ── Phase 5 — OCR ──────────────────────────────────────────────────────────
+
+
+@app.command(name="ocr")
+def ocr(
+    input: Path = typer.Argument(..., help="Scanned PDF to process"),
+    output: Path = typer.Option(..., "-o", "--output", help="Output searchable PDF"),
+    lang: str = typer.Option("fra+eng", "--lang", "-l", help="Tesseract language(s) e.g. 'fra+eng'"),
+    dpi: int = typer.Option(300, "--dpi"),
+    deskew: bool = typer.Option(False, "--deskew", help="Auto-straighten tilted pages"),
+    denoise: bool = typer.Option(False, "--denoise", help="Reduce image noise before OCR"),
+    pages: Optional[str] = typer.Option(None, "-p", "--pages"),
+    text_output: Optional[Path] = typer.Option(None, "--text", help="Also save extracted text"),
+) -> None:
+    """Run OCR on a scanned PDF and produce a searchable PDF."""
+    from quill.features.ocr import ocr_pdf
+
+    page_list = [int(p) for p in pages.split(",")] if pages else None
+    text = ocr_pdf(input, output, lang=lang, dpi=dpi, deskew=deskew, denoise=denoise, pages=page_list)
+
+    rprint(f"[green]✓[/green] Searchable PDF → {output}")
+    if text_output:
+        text_output.write_text(text, encoding="utf-8")
+        rprint(f"[green]✓[/green] Text → {text_output}")
+
+
+@app.command(name="pdf-to-images")
+def pdf_to_images(
+    input: Path = typer.Argument(..., help="PDF to convert"),
+    output_dir: Path = typer.Option(Path("."), "-o", "--output-dir"),
+    dpi: int = typer.Option(300, "--dpi"),
+    fmt: str = typer.Option("png", "--format", "-f", help="png | jpg"),
+    pages: Optional[str] = typer.Option(None, "-p", "--pages"),
+) -> None:
+    """Convert PDF pages to images."""
+    from quill.features.ocr import pdf_to_images as _convert
+
+    page_list = [int(p) for p in pages.split(",")] if pages else None
+    saved = _convert(input, output_dir, dpi=dpi, fmt=fmt, pages=page_list)
+    rprint(f"[green]✓[/green] {len(saved)} image(s) → {output_dir}")
+
+
 if __name__ == "__main__":
     app()
