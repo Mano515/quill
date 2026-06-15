@@ -1,5 +1,7 @@
 """API routes — Phase 3: annotations."""
 
+from pathlib import Path
+
 from fastapi import APIRouter, File, Form, UploadFile
 
 from quill.api.deps import parse_pages, pdf_response, workdir
@@ -114,7 +116,7 @@ async def add_image(
     with workdir() as tmp:
         src = tmp / "input.pdf"
         src.write_bytes(await file.read())
-        img_path = tmp / image.filename
+        img_path = tmp / (Path(image.filename).name if image.filename else "upload.bin")
         img_path.write_bytes(await image.read())
         out = tmp / "with_image.pdf"
         _add_img(src, out, img_path, x, y, width, height, parse_pages(pages))

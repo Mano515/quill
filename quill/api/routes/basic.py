@@ -45,8 +45,8 @@ async def split(
             for p in parts:
                 zf.write(p, p.name)
 
-        from fastapi.responses import FileResponse as FR
-        return FR(str(zip_path), media_type="application/zip", filename="split.zip")
+        from quill.api.deps import file_response
+        return file_response(zip_path, "split.zip", "application/zip")
 
 
 @router.post("/rotate", summary="Rotate pages")

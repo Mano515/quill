@@ -3,7 +3,7 @@
 from fastapi import APIRouter, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 
-from quill.api.deps import parse_pages, pdf_response, workdir
+from quill.api.deps import pdf_response, workdir
 
 router = APIRouter(prefix="/sign", tags=["Signatures"])
 

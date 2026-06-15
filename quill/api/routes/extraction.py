@@ -1,9 +1,9 @@
 """API routes — Phase 4: extraction."""
 
 from fastapi import APIRouter, File, Form, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
 
-from quill.api.deps import parse_pages, workdir
+from quill.api.deps import file_response, parse_pages, workdir
 
 router = APIRouter(prefix="/extraction", tags=["Extraction"])
 
@@ -23,18 +23,18 @@ async def extract_tables(
 
         if fmt == "excel":
             out = tmp / "tables.xlsx"
-            results = _extract(src, out, parse_pages(pages), "excel")
-            return FileResponse(str(out), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename="tables.xlsx")
+            _extract(src, out, parse_pages(pages), "excel")
+            return file_response(out, "tables.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         else:
-            results = _extract(src, tmp / "table.csv", parse_pages(pages), "csv")
+            _extract(src, tmp / "table.csv", parse_pages(pages), "csv")
             csv_files = list(tmp.glob("*.csv"))
             if len(csv_files) == 1:
-                return FileResponse(str(csv_files[0]), media_type="text/csv", filename=csv_files[0].name)
+                return file_response(csv_files[0], csv_files[0].name, "text/csv")
             zip_path = tmp / "tables.zip"
             with zipfile.ZipFile(zip_path, "w") as zf:
                 for f in csv_files:
                     zf.write(f, f.name)
-            return FileResponse(str(zip_path), media_type="application/zip", filename="tables.zip")
+            return file_response(zip_path, "tables.zip", "application/zip")
 
 
 @router.post("/images", summary="Extract embedded images")
@@ -55,7 +55,7 @@ async def extract_images(file: UploadFile = File(...)):
         with zipfile.ZipFile(zip_path, "w") as zf:
             for p in saved:
                 zf.write(p, p.name)
-        return FileResponse(str(zip_path), media_type="application/zip", filename="images.zip")
+        return file_response(zip_path, "images.zip", "application/zip")
 
 
 @router.post("/links", summary="Extract hyperlinks")
