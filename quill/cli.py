@@ -470,5 +470,179 @@ def pdf_to_images(
     rprint(f"[green]✓[/green] {len(saved)} image(s) → {output_dir}")
 
 
+# ── Phase 6 — Forms ────────────────────────────────────────────────────────
+
+
+@app.command(name="list-fields")
+def list_fields(
+    input: Path = typer.Argument(..., help="PDF with form fields"),
+) -> None:
+    """List all interactive form fields in a PDF."""
+    from quill.features.forms import list_fields as _list
+    from rich.table import Table
+
+    fields = _list(input)
+    if not fields:
+        rprint("[yellow]No form fields found.[/yellow]")
+        return
+
+    table = Table(show_header=True)
+    table.add_column("Name", style="cyan")
+    table.add_column("Type")
+    table.add_column("Value")
+    table.add_column("Options")
+    for f in fields:
+        opts = ", ".join(f["options"]) if f["options"] else "—"
+        table.add_row(f["name"], f["type"], str(f["value"] or ""), opts)
+    rprint(table)
+
+
+@app.command(name="fill-form")
+def fill_form(
+    input: Path = typer.Argument(..., help="PDF form to fill"),
+    output: Path = typer.Option(..., "-o", "--output"),
+    data: list[str] = typer.Option(..., "-d", "--data", help="Field=Value pairs e.g. -d name=Alice -d age=30"),
+) -> None:
+    """Fill form fields in a PDF. Pass -d field=value for each field."""
+    from quill.features.forms import fill_form as _fill
+
+    parsed = {}
+    for item in data:
+        if "=" not in item:
+            rprint(f"[red]✗[/red] Invalid format '{item}', expected field=value")
+            raise typer.Exit(1)
+        k, v = item.split("=", 1)
+        parsed[k.strip()] = v.strip()
+
+    _fill(input, output, parsed)
+    rprint(f"[green]✓[/green] Form filled → {output}")
+
+
+@app.command(name="flatten-form")
+def flatten_form(
+    input: Path = typer.Argument(..., help="PDF form to flatten"),
+    output: Path = typer.Option(..., "-o", "--output"),
+) -> None:
+    """Flatten a PDF form — make all fields non-editable."""
+    from quill.features.forms import flatten_form as _flatten
+
+    _flatten(input, output)
+    rprint(f"[green]✓[/green] Form flattened → {output}")
+
+
+@app.command(name="create-form")
+def create_form(
+    output: Path = typer.Option(..., "-o", "--output"),
+    config: Path = typer.Option(..., "-c", "--config", help="JSON file describing form fields"),
+) -> None:
+    """Create an interactive PDF form from a JSON field definition."""
+    import json
+    from quill.features.forms import create_form as _create
+
+    fields = json.loads(config.read_text(encoding="utf-8"))
+    _create(output, fields)
+    rprint(f"[green]✓[/green] Form created → {output}")
+
+
+# ── Phase 7 — Conversions ──────────────────────────────────────────────────
+
+
+@app.command(name="to-images")
+def to_images(
+    input: Path = typer.Argument(..., help="PDF to convert"),
+    output_dir: Path = typer.Option(Path("."), "-o", "--output-dir"),
+    fmt: str = typer.Option("png", "--format", "-f", help="png | jpg"),
+    dpi: int = typer.Option(150, "--dpi"),
+    quality: int = typer.Option(85, "--quality", help="JPEG quality (jpg only)"),
+) -> None:
+    """Convert PDF pages to PNG or JPEG images."""
+    from quill.features.convert import pdf_to_png, pdf_to_jpg
+
+    if fmt == "jpg":
+        saved = pdf_to_jpg(input, output_dir, dpi=dpi, quality=quality)
+    else:
+        saved = pdf_to_png(input, output_dir, dpi=dpi)
+
+    rprint(f"[green]✓[/green] {len(saved)} image(s) → {output_dir}")
+
+
+@app.command(name="from-images")
+def from_images(
+    images: list[Path] = typer.Argument(..., help="Image files to combine"),
+    output: Path = typer.Option(..., "-o", "--output"),
+) -> None:
+    """Combine images into a single PDF."""
+    from quill.features.convert import images_to_pdf
+
+    images_to_pdf(images, output)
+    rprint(f"[green]✓[/green] {len(images)} image(s) → {output}")
+
+
+@app.command(name="to-markdown")
+def to_markdown(
+    input: Path = typer.Argument(..., help="PDF to convert"),
+    output: Optional[Path] = typer.Option(None, "-o", "--output", help="Save to .md file"),
+) -> None:
+    """Convert a PDF to Markdown."""
+    from quill.features.convert import pdf_to_markdown
+
+    md = pdf_to_markdown(input, output)
+    if not output:
+        print(md)
+    else:
+        rprint(f"[green]✓[/green] Markdown → {output}")
+
+
+@app.command(name="to-json")
+def to_json(
+    input: Path = typer.Argument(..., help="PDF to convert"),
+    output: Optional[Path] = typer.Option(None, "-o", "--output"),
+    pages: Optional[str] = typer.Option(None, "-p", "--pages"),
+) -> None:
+    """Convert PDF text layout to structured JSON."""
+    import json
+    from quill.features.convert import pdf_to_json
+
+    page_list = [int(p) for p in pages.split(",")] if pages else None
+    result = pdf_to_json(input, output, page_list)
+
+    if not output:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        rprint(f"[green]✓[/green] JSON → {output}")
+
+
+@app.command(name="to-word")
+def to_word(
+    input: Path = typer.Argument(..., help="PDF to convert"),
+    output: Path = typer.Option(..., "-o", "--output", help="Output .docx file"),
+) -> None:
+    """Convert PDF to Word (.docx) via LibreOffice."""
+    from quill.features.convert import pdf_to_word
+
+    try:
+        pdf_to_word(input, output)
+        rprint(f"[green]✓[/green] Word document → {output}")
+    except RuntimeError as e:
+        rprint(f"[red]✗[/red] {e}")
+        raise typer.Exit(1)
+
+
+@app.command(name="from-word")
+def from_word(
+    input: Path = typer.Argument(..., help=".docx file to convert"),
+    output: Path = typer.Option(..., "-o", "--output", help="Output .pdf file"),
+) -> None:
+    """Convert Word (.docx) to PDF via LibreOffice."""
+    from quill.features.convert import word_to_pdf
+
+    try:
+        word_to_pdf(input, output)
+        rprint(f"[green]✓[/green] PDF → {output}")
+    except RuntimeError as e:
+        rprint(f"[red]✗[/red] {e}")
+        raise typer.Exit(1)
+
+
 if __name__ == "__main__":
     app()
