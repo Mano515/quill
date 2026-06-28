@@ -2,6 +2,11 @@
 
 from pathlib import Path
 
+# Doit correspondre à la constante MARGIN dans le JS de showInlineEditor.
+# Le JS ajoute cette marge autour du span pour agrandir la zone de couverture ;
+# on la soustrait ici pour retrouver la position exacte du texte original.
+_JS_MARGIN = 3
+
 
 def replace_text(
     input: Path,
@@ -16,9 +21,11 @@ def replace_text(
     """
     Replace text inside a bounding box on a PDF page.
 
-    Strategy: draw a white rectangle over the original text, then write
-    the new text at the same position. Font is auto-detected from the
-    content inside the rect; falls back to 12pt Helvetica if not found.
+    Strategy:
+      1. Detect font properties (size, bold, italic, color) from overlapping spans.
+      2. Detect text alignment (left / center / right) from span position on page.
+      3. Draw a white rectangle that covers the original text including descenders.
+      4. Insert the replacement text with matching style and alignment.
     """
     import fitz
 
@@ -33,32 +40,33 @@ def replace_text(
         pg = doc[page - 1]
         rect = fitz.Rect(x0, y0, x1, y1)
 
-        # Detect font properties from the span(s) that overlap the target rect
+        # ── 1. Detect font properties ──────────────────────────────────────
         font_size = 12.0
-        color = (0.0, 0.0, 0.0)
-        is_bold = False
+        color     = (0.0, 0.0, 0.0)
+        is_bold   = False
         is_italic = False
+
         for block in pg.get_text("dict")["blocks"]:
-            if block.get("type") != 0:  # 0 = text block
+            if block.get("type") != 0:   # 0 = text block
                 continue
             for line in block["lines"]:
                 for span in line["spans"]:
                     if fitz.Rect(span["bbox"]).intersects(rect):
                         font_size = span["size"]
                         # flags: bit 1 = italic, bit 4 = bold
-                        flags = span.get("flags", 0)
+                        flags     = span.get("flags", 0)
                         is_bold   = bool(flags & 16)
                         is_italic = bool(flags & 2)
-                        # Normalise color from 0-255 int to 0-1 float if needed
                         c = span.get("color", 0)
                         if isinstance(c, int):
-                            r = ((c >> 16) & 0xFF) / 255
-                            g = ((c >> 8) & 0xFF) / 255
-                            b = (c & 0xFF) / 255
-                            color = (r, g, b)
+                            color = (
+                                ((c >> 16) & 0xFF) / 255,
+                                ((c >>  8) & 0xFF) / 255,
+                                ( c        & 0xFF) / 255,
+                            )
                         break
 
-        # Choose the closest built-in Helvetica variant
+        # Closest built-in Helvetica variant (bold / italic combinations)
         if is_bold and is_italic:
             fontname = "hebi"   # Helvetica-BoldOblique
         elif is_bold:
@@ -68,24 +76,57 @@ def replace_text(
         else:
             fontname = "helv"   # Helvetica
 
-        # Extend the cover rect downward to include descenders (p, g, y…)
-        # Descenders reach approx 25 % of the font size below the baseline.
-        descender = font_size * 0.30
-        cover_rect = fitz.Rect(rect.x0, rect.y0, rect.x1, rect.y1 + descender)
+        # ── 2. Detect alignment ────────────────────────────────────────────
+        # The JS MARGIN was subtracted from x0 and added to x1, so the real
+        # text boundaries are x0+MARGIN and x1-MARGIN.
+        text_x0   = x0 + _JS_MARGIN   # actual left edge of original text
+        text_x1   = x1 - _JS_MARGIN   # actual right edge
+        text_y1   = y1 - _JS_MARGIN   # actual baseline
 
-        # Cover the original text with a white rectangle
+        page_w    = pg.rect.width
+        left_gap  = text_x0
+        right_gap = page_w - text_x1
+        mid_text  = (text_x0 + text_x1) / 2
+        mid_page  = page_w / 2
+
+        if abs(left_gap - right_gap) < font_size and abs(mid_text - mid_page) < font_size:
+            # Roughly symmetric margins → centered
+            align      = fitz.TEXT_ALIGN_CENTER
+            box_x0     = 0
+            box_x1     = page_w
+        elif right_gap < left_gap * 0.4:
+            # Much smaller right gap → right-aligned
+            align      = fitz.TEXT_ALIGN_RIGHT
+            box_x0     = 0
+            box_x1     = text_x1
+        else:
+            # Default: left-aligned
+            align      = fitz.TEXT_ALIGN_LEFT
+            box_x0     = text_x0
+            box_x1     = page_w - right_gap
+
+        # ── 3. Cover original text ─────────────────────────────────────────
+        # Extend the rect downward to hide descenders (p, g, y… ≈ 30 % of font).
+        descender   = font_size * 0.30
+        cover_rect  = fitz.Rect(rect.x0, rect.y0, rect.x1, rect.y1 + descender)
+
         shape = pg.new_shape()
         shape.draw_rect(cover_rect)
         shape.finish(color=(1, 1, 1), fill=(1, 1, 1), width=0)
         shape.commit()
 
-        # Insert new text at the baseline (y1 = bottom of the original rect)
-        pg.insert_text(
-            fitz.Point(x0, y1),
+        # ── 4. Insert replacement text ─────────────────────────────────────
+        # Use insert_textbox so alignment is handled correctly.
+        # The box height is generous (3× font size) to avoid clipping.
+        insert_rect = fitz.Rect(box_x0, text_y1 - font_size * 1.2, box_x1, text_y1 + descender)
+
+        pg.insert_textbox(
+            insert_rect,
             new_text,
             fontsize=font_size,
             fontname=fontname,
             color=color,
+            align=align,
         )
 
         doc.save(str(output), garbage=4, deflate=True)
