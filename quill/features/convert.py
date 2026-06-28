@@ -9,17 +9,17 @@ def pdf_to_png(input: Path, output_dir: Path, dpi: int = 150) -> list[Path]:
 
     output_dir.mkdir(parents=True, exist_ok=True)
     doc = fitz.open(str(input))
-    saved: list[Path] = []
-    mat = fitz.Matrix(dpi / 72, dpi / 72)
-
-    for i, page in enumerate(doc):
-        pix = page.get_pixmap(matrix=mat)
-        out = output_dir / f"page_{i + 1:04d}.png"
-        pix.save(str(out))
-        saved.append(out)
-
-    doc.close()
-    return saved
+    try:
+        saved: list[Path] = []
+        mat = fitz.Matrix(dpi / 72, dpi / 72)
+        for i, page in enumerate(doc):
+            pix = page.get_pixmap(matrix=mat)
+            out = output_dir / f"page_{i + 1:04d}.png"
+            pix.save(str(out))
+            saved.append(out)
+        return saved
+    finally:
+        doc.close()
 
 
 def pdf_to_jpg(input: Path, output_dir: Path, dpi: int = 150, quality: int = 85) -> list[Path]:
@@ -28,18 +28,17 @@ def pdf_to_jpg(input: Path, output_dir: Path, dpi: int = 150, quality: int = 85)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     doc = fitz.open(str(input))
-    saved: list[Path] = []
-    mat = fitz.Matrix(dpi / 72, dpi / 72)
-
-    for i, page in enumerate(doc):
-        pix = page.get_pixmap(matrix=mat)
-        out = output_dir / f"page_{i + 1:04d}.jpg"
-        # pymupdf can save jpg directly
-        pix.save(str(out), jpg_quality=quality)
-        saved.append(out)
-
-    doc.close()
-    return saved
+    try:
+        saved: list[Path] = []
+        mat = fitz.Matrix(dpi / 72, dpi / 72)
+        for i, page in enumerate(doc):
+            pix = page.get_pixmap(matrix=mat)
+            out = output_dir / f"page_{i + 1:04d}.jpg"
+            pix.save(str(out), jpg_quality=quality)
+            saved.append(out)
+        return saved
+    finally:
+        doc.close()
 
 
 def images_to_pdf(images: list[Path], output: Path) -> None:
@@ -48,16 +47,16 @@ def images_to_pdf(images: list[Path], output: Path) -> None:
     from PIL import Image
 
     doc = fitz.open()
-    for img_path in images:
-        # Open with PIL to get dimensions
-        with Image.open(img_path) as im:
-            w, h = im.size
-        # Points: 1px = 0.75pt at 96 dpi — use actual pixel size
-        page = doc.new_page(width=w, height=h)
-        page.insert_image(page.rect, filename=str(img_path))
-
-    doc.save(str(output))
-    doc.close()
+    try:
+        for img_path in images:
+            with Image.open(img_path) as im:
+                w, h = im.size
+            # Use the pixel dimensions directly as PDF points (1 px ≈ 0.75 pt at 96 dpi)
+            page = doc.new_page(width=w, height=h)
+            page.insert_image(page.rect, filename=str(img_path))
+        doc.save(str(output))
+    finally:
+        doc.close()
 
 
 def pdf_to_markdown(input: Path, output: Path | None = None) -> str:
@@ -74,8 +73,7 @@ def pdf_to_markdown(input: Path, output: Path | None = None) -> str:
         with pdfplumber.open(input) as pdf:
             for i, page in enumerate(pdf.pages, start=1):
                 lines.append(f"## Page {i}\n")
-                text = page.extract_text() or ""
-                lines.append(text)
+                lines.append(page.extract_text() or "")
                 lines.append("")
         md = "\n".join(lines)
 
@@ -133,7 +131,7 @@ def word_to_pdf(input: Path, output: Path) -> None:
     if result.returncode != 0:
         raise RuntimeError(f"LibreOffice conversion failed: {result.stderr}")
 
-    # LibreOffice names the output <stem>.pdf
+    # LibreOffice names the output <stem>.pdf; rename if needed
     generated = output.parent / f"{input.stem}.pdf"
     if generated != output:
         generated.rename(output)

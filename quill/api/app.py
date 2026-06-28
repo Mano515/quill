@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from quill.api.auth import API_KEY, require_key
-from quill.api.routes import annotations, basic, convert, extraction, forms, ocr, security, sign
+from quill.api.routes import annotations, basic, convert, edit, extraction, forms, ocr, security, sign
 
 app = FastAPI(
     title="Quill PDF API",
@@ -35,6 +35,7 @@ app.include_router(forms.router, dependencies=[_auth])
 app.include_router(convert.router, dependencies=[_auth])
 app.include_router(ocr.router, dependencies=[_auth])
 app.include_router(sign.router, dependencies=[_auth])
+app.include_router(edit.router, dependencies=[_auth])
 
 
 @app.get("/health")

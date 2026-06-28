@@ -16,62 +16,131 @@
     /* ── Login ── */
     #login-screen { position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000; }
     .login-box { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 44px;width:360px;text-align:center; }
-    .login-box .llogo { width:48px;height:48px;background:var(--accent-dim);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--accent); }
-    .login-box h1 { font-size:22px;margin-bottom:6px; }
-    .login-box p { color:var(--dim);font-size:13px;margin-bottom:24px; }
-    .login-box input { width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:10px 14px;font-size:14px;font-family:monospace;outline:none;margin-bottom:14px;letter-spacing:2px;text-align:center; }
+    .login-box .llogo { width:52px;height:52px;background:var(--accent-dim);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:var(--accent);font-size:22px; }
+    .login-box h1 { font-size:24px;margin-bottom:6px; }
+    .login-box p { color:var(--dim);font-size:13px;margin-bottom:28px; }
+    .login-box input { width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:11px 14px;font-size:14px;font-family:monospace;outline:none;margin-bottom:14px;letter-spacing:2px;text-align:center;transition:border-color .15s; }
     .login-box input:focus { border-color:var(--accent); }
-    .login-box button { width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:11px;font-size:14px;font-weight:600;cursor:pointer; }
+    .login-box button { width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s; }
     .login-box button:hover { background:var(--accent-h); }
     .login-err { color:var(--err);font-size:12px;margin-top:10px;display:none; }
 
     /* ── Shell ── */
     #app { display:none;flex-direction:column;height:100vh; }
     #app.visible { display:flex; }
-    header { padding:13px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);flex-shrink:0; }
-    header h1 { font-size:18px;font-weight:700; }
+    header { padding:11px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);flex-shrink:0; }
+    header .logo { display:flex;align-items:center;gap:9px; }
+    header .logo span { font-size:17px;font-weight:700; }
     header .sp { flex:1; }
-    .key-badge { font-size:11px;color:var(--dim);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:monospace;cursor:pointer;transition:border-color .15s; }
-    .key-badge:hover { border-color:var(--accent); }
     .kbd { display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--dim); }
     .kbd kbd { background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:monospace;font-size:10px; }
-    .logout-btn { background:none;border:1px solid var(--border);color:var(--dim);border-radius:var(--radius);padding:5px 12px;font-size:12px;cursor:pointer;transition:all .15s; }
-    .logout-btn:hover { color:var(--err);border-color:var(--err); }
+    .key-badge { font-size:12px;color:var(--dim);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-family:monospace;cursor:pointer;transition:border-color .15s; }
+    .key-badge:hover { border-color:var(--accent); }
+    .logout-btn { background:none;border:1px solid rgba(248,113,113,.4);color:var(--err);border-radius:var(--radius);padding:7px 15px;font-size:13px;cursor:pointer;transition:all .15s; }
+    .logout-btn:hover { background:rgba(248,113,113,.12);border-color:var(--err); }
+    .hdr-nav { border-left:none!important;border-radius:var(--radius)!important;padding:7px 15px!important;font-size:14px!important;white-space:nowrap; }
+    .hdr-nav.active { background:var(--accent-dim)!important;color:var(--accent)!important; }
+    .hdr-search { width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:7px 14px;font-size:14px;outline:none;transition:border-color .15s,width .2s; }
+    .hdr-search:focus { border-color:var(--accent);width:280px; }
 
     /* ── Layout ── */
-    .layout { display:grid;grid-template-columns:220px 1fr 330px;flex:1;overflow:hidden; }
-    nav { background:var(--surface);border-right:1px solid var(--border);padding:10px 0;overflow-y:auto;display:flex;flex-direction:column; }
-    .group-label { font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);padding:12px 16px 4px; }
-    nav button { display:block;width:100%;text-align:left;background:none;border:none;border-left:3px solid transparent;color:var(--dim);padding:7px 16px;cursor:pointer;font-size:13px;transition:all .12s; }
-    nav button:hover { color:var(--text);background:var(--surface2); }
-    nav button.active { color:var(--accent);border-left-color:var(--accent);background:var(--surface2); }
-    .nav-spacer { flex:1; }
-    .nav-history-btn { border-top:1px solid var(--border);margin-top:4px;padding-top:4px; }
-    main { padding:22px 26px;overflow-y:auto; }
+    .layout { display:grid;grid-template-columns:380px 1fr;grid-auto-rows:minmax(0,1fr);flex:1;overflow:hidden; }
+    .layout.has-sidebar { grid-template-columns:380px 1fr 320px; }
+    .layout.home-mode { grid-template-columns:1fr; }
+    .layout.home-mode.has-sidebar { grid-template-columns:1fr 320px; }
+    .layout.home-mode main { display:none; }
+
+    /* ── File sidebar ── */
+    #history-sidebar { background:var(--surface);border-left:1px solid var(--border);display:none; }
+    #history-sidebar.visible { display:flex;flex-direction:column;overflow:hidden; }
+    .sidebar-dz { flex-shrink:0;margin:10px;border:2px dashed var(--border);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .18s;background:var(--surface2); }
+    .sidebar-dz:hover,.sidebar-dz.drag-over { border-color:var(--accent);background:var(--accent-dim); }
+    .sidebar-dz .sdz-icon { font-size:28px;margin-bottom:6px; }
+    .sidebar-dz .sdz-title { font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px; }
+    .sidebar-dz .sdz-sub { font-size:11px;color:var(--dim); }
+    .sidebar-dz .sdz-file { font-size:11px;color:var(--accent);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    #sidebar-thumbs { flex:1;min-height:0;overflow-y:auto;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start;align-items:start; }
+    .sidebar-clear-wrap { flex-shrink:0;padding:10px; }
+    .sidebar-clear-btn { width:100%;background:none;border:1px solid rgba(248,113,113,.4);color:var(--err);border-radius:var(--radius);padding:9px 14px;font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px; }
+    .sidebar-clear-btn:hover { background:rgba(248,113,113,.12);border-color:var(--err); }
+    .stb { cursor:pointer;border-radius:6px;border:2px solid var(--border);transition:all .12s;background:#fff;overflow:visible; }
+    .stb:hover { border-color:var(--accent-h); }
+    .stb.active { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim); }
+    .stb canvas { display:block;width:100%;height:auto;border-radius:4px 4px 0 0; }
+    .stb:last-child:nth-child(odd) { grid-column:1/-1;max-width:calc(50% - 3px);justify-self:center; }
+    .stb .stb-num { background:rgba(0,0,0,.55);color:#fff;font-size:10px;text-align:center;padding:2px 0;border-radius:0 0 4px 4px; }
+
+    /* ── Nav (caché — navigation via l'accueil) ── */
+    nav { display:none; }
+
+    /* ── Tools drawer ── */
+    #tools-drawer { position:fixed;top:47px;left:0;bottom:0;width:660px;background:var(--surface);border-right:1px solid var(--border);z-index:300;transform:translateX(-100%);transition:transform .22s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column; }
+    #tools-drawer.open { transform:translateX(0); box-shadow:4px 0 24px rgba(0,0,0,.4); }
+    #drawer-backdrop { display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:299; }
+    #drawer-backdrop.open { display:block; }
+    #tools-drawer .drawer-inner { padding:24px 28px; }
+    .burger-btn { background:none;border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:7px 12px;font-size:18px;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0; }
+    .burger-btn:hover { border-color:var(--accent);color:var(--accent); }
+    .nav-search-wrap { padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0; }
+    .nav-search { width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 10px 7px 30px;font-size:13px;outline:none;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237b7f9e' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:9px center; }
+    .nav-search:focus { border-color:var(--accent); }
+    .nav-scroll { flex:1;overflow-y:auto;padding:6px 0; }
+    .group-label { font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);padding:14px 14px 4px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none; }
+    .group-label:hover { color:var(--text); }
+    .group-label .gl-arrow { margin-left:auto;transition:transform .2s;font-size:9px; }
+    .group-label.collapsed .gl-arrow { transform:rotate(-90deg); }
+    .group-items.collapsed { display:none; }
+    nav button.nav-item { display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;border-left:3px solid transparent;color:var(--dim);padding:9px 14px 9px 13px;cursor:pointer;font-size:14px;transition:all .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    nav button.nav-item:hover { color:var(--text);background:var(--surface2); }
+    nav button.nav-item.active { color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim); }
+    .nav-item-icon { font-size:15px;flex-shrink:0;width:20px;text-align:center; }
+    .nav-no-results { padding:16px 14px;color:var(--dim);font-size:12px;text-align:center;display:none; }
+    .nav-footer { border-top:1px solid var(--border);flex-shrink:0;padding:6px 0; }
+    .nav-footer button.nav-item { border-left-color:transparent; }
+
+    /* ── Main ── */
+    main { padding:24px 28px;overflow-y:auto; }
     .panel { display:none; }
     .panel.active { display:block; }
-    h2 { font-size:17px;font-weight:700;margin-bottom:4px; }
-    .desc { color:var(--dim);font-size:13px;margin-bottom:20px; }
-    .form-grid { display:grid;gap:14px;max-width:530px; }
-    label { display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--dim); }
-    label strong { color:var(--text);font-size:13px; }
-    input[type="text"],select,textarea { background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:9px 12px;font-size:13px;font-family:inherit;width:100%;outline:none;transition:border-color .15s; }
+    h2 { font-size:18px;font-weight:700;margin-bottom:4px; }
+    .desc { color:var(--dim);font-size:13px;margin-bottom:22px;line-height:1.5; }
+    .form-grid { display:grid;gap:16px;max-width:540px; }
+    label { display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--dim); }
+    label strong { color:var(--text);font-size:13px;font-weight:600; }
+    input[type="text"],select,textarea { background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:10px 14px;font-size:14px;font-family:inherit;width:100%;outline:none;transition:border-color .15s; }
     input:focus,select:focus,textarea:focus { border-color:var(--accent); }
     textarea { resize:vertical;min-height:80px; }
 
-    /* ── Drop zone ── */
-    .drop-zone { border:2px dashed var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;cursor:pointer;transition:all .15s;position:relative;background:var(--surface2); }
+    /* ── Home panel ── */
+    .home-wrap { max-width:680px; }
+    .home-hero { border:2px dashed var(--border);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--surface);margin-bottom:28px; }
+    .home-hero:hover,.home-hero.drag-over { border-color:var(--accent);background:var(--accent-dim); }
+    .home-hero input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+    .home-hero-icon { font-size:42px;margin-bottom:12px; }
+    .home-hero h3 { font-size:17px;font-weight:700;margin-bottom:6px; }
+    .home-hero p { color:var(--dim);font-size:13px; }
+    .home-hero .home-file-badge { display:inline-flex;align-items:center;gap:8px;background:var(--surface3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;margin-top:14px;color:var(--text); }
+    .home-section-title { font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);margin-bottom:12px; }
+    .quick-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px; }
+    .quick-card { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 12px;cursor:pointer;transition:all .15s;text-align:center; }
+    .quick-card:hover { border-color:var(--accent);background:var(--accent-dim);transform:translateY(-1px); }
+    .quick-card .qc-icon { font-size:24px;margin-bottom:8px; }
+    .quick-card .qc-label { font-size:12px;font-weight:600;color:var(--text); }
+    .quick-card .qc-group { font-size:11px;color:var(--dim);margin-top:2px; }
+
+    /* ── Drop zone (in forms) ── */
+    .drop-zone { border:2px dashed var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;cursor:pointer;transition:all .15s;position:relative;background:var(--surface2); }
     .drop-zone:hover,.drop-zone.drag-over { border-color:var(--accent);background:var(--accent-dim); }
     .drop-zone input[type="file"] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
     .dz-text { color:var(--dim);font-size:13px; }
     .dz-text strong { color:var(--accent); }
     .dz-hint { font-size:11px;color:var(--dim);margin-top:3px; }
     .dz-files { margin-top:10px;display:flex;flex-direction:column;gap:4px; }
-    .dz-file-item { background:var(--surface3);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px; }
+    .dz-file-item { background:var(--surface3);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px; }
     .dz-file-item .sz { color:var(--dim);font-size:11px;margin-left:auto; }
 
     /* ── Global drag overlay ── */
-    #drag-overlay { position:fixed;inset:0;background:rgba(108,99,255,.15);border:3px dashed var(--accent);z-index:900;display:none;align-items:center;justify-content:center;pointer-events:none; }
+    #drag-overlay { position:fixed;inset:0;background:rgba(108,99,255,.15);border:3px dashed var(--accent);z-index:900;display:none;align-items:center;justify-content:center; }
     #drag-overlay.visible { display:flex; }
     #drag-overlay .dg-inner { background:var(--surface);border-radius:16px;padding:32px 48px;text-align:center;border:1px solid var(--accent); }
     #drag-overlay .dg-inner h3 { font-size:18px;color:var(--accent);margin-bottom:6px; }
@@ -97,46 +166,46 @@
     .xy-hint { font-size:12px;color:var(--accent);margin-top:4px; }
 
     /* ── Chain pill ── */
-    #chain-pill { position:fixed;bottom:24px;right:356px;background:var(--accent);color:#fff;border:none;border-radius:24px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(108,99,255,.4);display:none;align-items:center;gap:8px;transition:all .2s;z-index:100; }
+    #chain-pill { position:fixed;bottom:24px;right:440px;background:var(--accent);color:#fff;border:none;border-radius:24px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(108,99,255,.4);display:none;align-items:center;gap:8px;transition:all .2s;z-index:100; }
     #chain-pill:hover { background:var(--accent-h);transform:translateY(-1px); }
     #chain-pill.visible { display:flex; }
     #chain-overlay { display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);align-items:center;justify-content:center; }
     #chain-overlay.visible { display:flex; }
-    .chain-modal { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:480px;max-height:70vh;overflow-y:auto; }
+    .chain-modal { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:500px;max-height:70vh;overflow-y:auto; }
     .chain-modal h3 { margin-bottom:16px;font-size:15px; }
     .chain-ops { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
-    .chain-op-btn { background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;text-align:left;cursor:pointer;font-size:13px;transition:all .12s; }
+    .chain-op-btn { background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px 16px;text-align:left;cursor:pointer;font-size:14px;transition:all .12s;display:flex;align-items:center;gap:8px; }
     .chain-op-btn:hover { border-color:var(--accent);color:var(--accent); }
-    .chain-cancel,.modal-cancel { margin-top:14px;width:100%;background:none;border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:8px;cursor:pointer;font-size:13px; }
+    .chain-cancel,.modal-cancel { margin-top:14px;width:100%;background:none;border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:10px;cursor:pointer;font-size:14px; }
     .chain-cancel:hover,.modal-cancel:hover { color:var(--text); }
 
-    /* ── History panel ── */
-    .history-empty { color:var(--dim);font-size:13px;padding:20px 0;text-align:center; }
+    /* ── History ── */
+    .history-empty { color:var(--dim);font-size:13px;padding:30px 0;text-align:center; }
     .history-list { display:flex;flex-direction:column;gap:10px;margin-top:4px; }
-    .history-item { background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px; }
-    .history-item .hi-top { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+    .history-item { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px; }
+    .history-item .hi-top { display:flex;align-items:center;gap:10px;margin-bottom:6px; }
     .history-item .hi-op { font-weight:600;font-size:13px; }
     .history-item .hi-time { color:var(--dim);font-size:11px;margin-left:auto; }
     .history-item .hi-files { font-size:12px;color:var(--dim);margin-bottom:10px; }
     .history-item .hi-files span { color:var(--text); }
     .history-item .hi-actions { display:flex;gap:8px; }
-    .history-item .hi-dl { background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;text-decoration:none; }
+    .history-item .hi-dl { background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;text-decoration:none; }
     .history-item .hi-dl:hover { background:var(--accent);color:#fff; }
-    .history-item .hi-use { background:var(--surface3);border:1px solid var(--border);color:var(--dim);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer; }
+    .history-item .hi-use { background:var(--surface3);border:1px solid var(--border);color:var(--dim);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer; }
     .history-item .hi-use:hover { color:var(--text);border-color:var(--text); }
     .history-badge { background:var(--accent);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:6px;font-weight:700; }
 
     /* ── Submit ── */
-    .form-actions { display:flex;align-items:center;gap:14px; }
-    button.submit { background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:10px 22px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s; }
+    .form-actions { display:flex;align-items:center;gap:14px;margin-top:4px; }
+    button.submit { background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:13px 30px;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s; }
     button.submit:hover { background:var(--accent-h); }
     button.submit:disabled { opacity:.5;cursor:not-allowed; }
-    .json-out { margin-top:14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;display:none;color:var(--dim); }
+    .json-out { margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:340px;overflow-y:auto;display:none;color:var(--dim); }
     .spinner { display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px; }
     @keyframes spin { to{transform:rotate(360deg)} }
 
     /* ── Toasts ── */
-    #toast-container { position:fixed;top:16px;right:340px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none; }
+    #toast-container { position:fixed;top:16px;right:440px;z-index:500;display:flex;flex-direction:column;gap:8px;pointer-events:none; }
     .toast { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:13px;min-width:260px;max-width:380px;box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:all;display:flex;align-items:flex-start;gap:10px;animation:slideIn .25s ease; }
     @keyframes slideIn { from{transform:translateX(20px);opacity:0} to{transform:translateX(0);opacity:1} }
     .toast.out { animation:slideOut .25s ease forwards; }
@@ -156,7 +225,7 @@
     .toast.fail .toast-bar { background:var(--err); }
     @keyframes tbar { from{width:100%} to{width:0%} }
 
-    /* ── Shortcuts cheatsheet ── */
+    /* ── Shortcuts modal ── */
     #shortcuts-modal { display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);align-items:center;justify-content:center; }
     #shortcuts-modal.visible { display:flex; }
     .shortcuts-box { background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:420px; }
@@ -167,29 +236,68 @@
 
     /* ── Preview panel ── */
     .preview-panel { border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden; }
-    .preview-tabs { display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);flex-shrink:0; }
-    .preview-tabs button { flex:1;background:var(--surface);border:none;color:var(--dim);padding:9px 8px;font-size:12px;cursor:pointer;transition:all .12s; }
-    .preview-tabs button.active { background:var(--surface2);color:var(--text); }
-    .preview-tabs button:hover:not(.active) { background:var(--surface2); }
-    .preview-header { padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;flex-shrink:0; }
-    .page-controls { margin-left:auto;display:flex;align-items:center;gap:6px; }
-    .page-controls button { background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:12px;transition:all .12s; }
+    .preview-header { padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .preview-filename { font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .preview-filedim { font-size:11px;color:var(--dim); }
+    .edit-mode-btn { background:none;border:1px solid var(--border);color:var(--dim);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0; }
+    #dl-btn { display:none;align-items:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;text-decoration:none; }
+    #dl-btn:hover { background:var(--accent-h);transform:translateY(-1px);box-shadow:0 4px 14px rgba(108,99,255,.4); }
+    #dl-btn.visible { display:inline-flex; }
+    .edit-mode-btn:hover { border-color:var(--accent);color:var(--accent); }
+    .edit-mode-btn.active { background:var(--accent);color:#fff;border-color:var(--accent); }
+    .page-controls { display:flex;align-items:center;gap:5px;flex-shrink:0; }
+    .page-controls button { background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:13px;transition:all .12s; }
     .page-controls button:hover:not(:disabled) { border-color:var(--accent);color:var(--accent); }
-    .page-controls button:disabled { opacity:.4;cursor:not-allowed; }
-    .page-info { font-size:12px;color:var(--dim);min-width:50px;text-align:center; }
-    .xy-bar { font-size:11px;color:var(--accent);padding:5px 14px;border-bottom:1px solid var(--border);display:none;flex-shrink:0;background:var(--accent-dim); }
+    .page-controls button:disabled { opacity:.35;cursor:not-allowed; }
+    .page-info { font-size:12px;color:var(--dim);min-width:46px;text-align:center; }
+    .xy-bar { font-size:11px;color:var(--accent);padding:6px 14px;border-bottom:1px solid var(--border);display:none;flex-shrink:0;background:var(--accent-dim);line-height:1.4; }
     .xy-bar.visible { display:block; }
-    .preview-body { flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px; }
-    .preview-placeholder { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:13px;gap:12px;text-align:center; }
-    .preview-placeholder svg { opacity:.3; }
-    .canvas-wrap { width:100%;background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.4);position:relative; }
+    .preview-body { flex:1;overflow:auto;padding:60px 80px;display:flex;flex-direction:column;align-items:flex-start;gap:10px; }
+    .preview-body > * { flex-shrink:0;margin-left:auto;margin-right:auto; }
+    .preview-placeholder { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--dim);font-size:13px;gap:14px;text-align:center; }
+    .preview-placeholder svg { opacity:.25; }
+    .preview-placeholder p { line-height:1.6; }
+    .preview-dropzone { border:2px dashed var(--border);border-radius:16px;padding:60px 48px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:420px;width:100%;margin-bottom:12vh; }
+    .preview-dropzone:hover,.preview-dropzone.drag-over { border-color:var(--accent);background:var(--accent-dim); }
+    .preview-dropzone .dz-icon { font-size:48px;line-height:1; }
+    .preview-dropzone h3 { font-size:17px;font-weight:700;color:var(--text); }
+    .preview-dropzone p { font-size:13px;color:var(--dim); }
+    @keyframes page-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .canvas-wrap { background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.4);position:relative;flex-shrink:0;animation:page-in .18s ease; }
     .canvas-wrap.xy-active { cursor:crosshair; }
-    .canvas-wrap canvas { width:100%;display:block; }
+    .canvas-wrap canvas { display:block; }
     .xy-crosshair { position:absolute;pointer-events:none;display:none; }
     .xy-crosshair.on { display:block; }
     .xy-crosshair::before,.xy-crosshair::after { content:'';position:absolute;background:rgba(108,99,255,.75); }
     .xy-crosshair::before { width:1px;height:14px;top:-7px;left:0; }
     .xy-crosshair::after { width:14px;height:1px;top:0;left:-7px; }
+
+    /* ── Text edit mode ── */
+    .text-layer { position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;pointer-events:none;line-height:1; }
+    .text-layer.edit-active { pointer-events:all; }
+    .text-layer span { color:transparent;position:absolute;white-space:pre;transform-origin:0% 0%;border-radius:2px;transition:background .08s,outline .08s; }
+    .text-layer.edit-active span { cursor:text; }
+    .text-layer.edit-active span:hover { background:rgba(108,99,255,.2) !important;outline:1.5px solid rgba(108,99,255,.55);outline-offset:2px; }
+    .text-layer.edit-active span.tl-selected { background:rgba(108,99,255,.18) !important;outline:2px solid var(--accent);outline-offset:2px; }
+    .text-layer.edit-active span.tl-loading { background:rgba(108,99,255,.28) !important;pointer-events:none;outline:2px dashed var(--accent);outline-offset:2px; }
+
+    /* ── Floating toolbar ── */
+    .text-editor-toolbar { position:absolute;z-index:60;background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.5),0 0 0 1px rgba(108,99,255,.15);font-size:12px;color:var(--text);white-space:nowrap;transform:translateY(calc(-100% - 8px));animation:tet-in .15s ease both;pointer-events:all; }
+    @keyframes tet-in { from{opacity:0;transform:translateY(calc(-100% - 3px)) scale(.95)} to{opacity:1;transform:translateY(calc(-100% - 8px))} }
+    .tet-info { color:var(--dim);font-size:11px;font-family:monospace; }
+    .tet-sep { width:1px;height:14px;background:var(--border);flex-shrink:0; }
+    .tet-hint { font-size:10px;color:var(--dim); }
+    .tet-btn { background:none;border:1px solid transparent;cursor:pointer;padding:3px 9px;border-radius:5px;font-size:12px;font-weight:600;transition:all .1s;color:var(--text);white-space:nowrap; }
+    .tet-btn:hover:not(:disabled) { background:var(--surface2);border-color:var(--border); }
+    .tet-btn:disabled { opacity:.4;cursor:not-allowed; }
+    .tet-confirm { color:var(--ok); }
+    .tet-confirm:hover:not(:disabled) { background:rgba(74,222,128,.1) !important;border-color:var(--ok) !important; }
+    .tet-cancel { color:var(--err); }
+    .tet-cancel:hover:not(:disabled) { background:rgba(248,113,113,.1) !important;border-color:var(--err) !important; }
+
+    /* ── Inline editor (contenteditable) ── */
+    .inline-editor { position:absolute;z-index:50;background:rgba(255,255,255,.97);color:#1a1a2e;border:2px solid var(--accent);border-radius:3px;padding:1px 5px;outline:none;white-space:pre;overflow:visible;box-shadow:0 0 0 4px rgba(108,99,255,.18),0 4px 20px rgba(0,0,0,.35);cursor:text;animation:editor-in .12s ease both;min-width:40px;line-height:1.4; }
+    @keyframes editor-in { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
   </style>
 </head>
 <body>
@@ -197,11 +305,7 @@
 <!-- Login -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="llogo">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-      </svg>
-    </div>
+    <div class="llogo">✏️</div>
     <h1>Quill</h1>
     <p>Entrez votre clé API pour accéder à l'éditeur PDF.</p>
     <input type="password" id="login-key" placeholder="Clé API" autocomplete="off" />
@@ -213,43 +317,77 @@
 <!-- App -->
 <div id="app">
   <header>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
-      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-    </svg>
-    <h1>Quill</h1>
+    <button class="burger-btn" id="burger-btn" title="Outils">☰</button>
+    <div class="logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+      <span>Quill</span>
+    </div>
+    <div style="width:1px;height:18px;background:var(--border);margin:0 4px"></div>
+    <input class="nav-search hdr-search" id="nav-search" type="text" placeholder="🔍 Rechercher un outil…" autocomplete="off" />
     <div class="sp"></div>
-    <span class="kbd"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> soumettre &nbsp;·&nbsp; <kbd>?</kbd> aide</span>
-    <span class="key-badge" id="key-display" title="Cliquer pour copier">••••••••</span>
+    <span class="kbd" style="margin-right:8px"><kbd>?</kbd> aide &nbsp;·&nbsp; <kbd>Ctrl</kbd>+<kbd>Enter</kbd> lancer</span>
+    <span class="key-badge" id="key-display" title="Cliquer pour copier la clé">••••••••</span>
     <button class="logout-btn" id="logout-btn">Déconnexion</button>
   </header>
 
   <div class="layout">
+    <!-- Nav -->
     <nav id="nav">
-      <!-- items injected by JS -->
-      <div class="nav-spacer"></div>
-      <div class="nav-history-btn">
-        <button id="nav-history" data-id="__history">
-          📋 Historique <span class="history-badge" id="history-badge" style="display:none">0</span>
+      <div class="nav-search-wrap">
+        <input class="nav-search" id="nav-search" type="text" placeholder="Rechercher un outil…" autocomplete="off" />
+      </div>
+      <div class="nav-scroll" id="nav-scroll">
+        <!-- injected by JS -->
+        <div class="nav-no-results" id="nav-no-results">Aucun outil trouvé</div>
+      </div>
+      <div class="nav-footer">
+        <button class="nav-item" id="nav-history" data-id="__history">
+          <span class="nav-item-icon">📋</span>
+          Historique
+          <span class="history-badge" id="history-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-item" id="nav-home" data-id="__home">
+          <span class="nav-item-icon">🏠</span>
+          Accueil
         </button>
       </div>
     </nav>
+
+    <!-- Main -->
     <main id="main">
-      <!-- History panel -->
-      <div class="panel" id="panel-__history">
-        <h2>Historique de session</h2>
-        <p class="desc">Les opérations effectuées depuis l'ouverture de Quill. Les fichiers sont disponibles jusqu'à la fermeture de l'onglet.</p>
-        <div id="history-content"><div class="history-empty">Aucune opération pour l'instant.</div></div>
+      <!-- Home panel -->
+      <div class="panel" id="panel-__home">
+        <div class="home-wrap">
+          <h2 style="margin-bottom:6px">Bienvenue sur Quill</h2>
+          <p class="desc">Glissez-déposez un PDF n'importe où, ou ouvrez le menu ☰ pour choisir une opération.</p>
+
+          <div class="home-hero" id="home-hero">
+            <input type="file" id="home-file-input" accept=".pdf,image/*" multiple />
+            <div class="home-hero-icon">📂</div>
+            <h3>Déposez votre fichier ici</h3>
+            <p>PDF, images — ou cliquez pour parcourir</p>
+            <div class="home-file-badge" id="home-file-badge" style="display:none">
+              <span>📄</span><span id="home-file-name"></span>
+            </div>
+          </div>
+
+        </div>
       </div>
+
     </main>
 
-    <div class="preview-panel">
-      <div class="preview-tabs">
-        <button class="active" id="tab-input">Fichier source</button>
-        <button id="tab-output">Résultat</button>
-      </div>
+    <!-- Preview (prend tout l'espace central) -->
+    <div class="preview-panel" style="border-right:1px solid var(--border)">
       <div class="preview-header">
-        <span>Aperçu</span>
+        <span class="preview-filename" id="preview-filename">—</span>
+        <a id="dl-btn" download="resultat.pdf">⬇ Télécharger</a>
         <div class="page-controls">
+          <button id="zoom-out" title="Dézoomer">−</button>
+          <button id="zoom-fit" title="Ajuster à la page">⊡</button>
+          <button id="zoom-in" title="Zoomer">+</button>
+          <div style="width:1px;height:14px;background:var(--border);margin:0 2px"></div>
           <button id="prev-page" disabled>‹</button>
           <span class="page-info" id="page-info">—</span>
           <button id="next-page" disabled>›</button>
@@ -258,27 +396,57 @@
       <div class="xy-bar" id="xy-bar">🎯 Cliquez sur l'aperçu pour placer l'élément</div>
       <div class="preview-body" id="preview-body">
         <div class="preview-placeholder">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
           </svg>
-          <span>Sélectionnez un fichier<br>pour voir l'aperçu</span>
+          <p>Glissez un PDF ici<br>ou sélectionnez un outil</p>
         </div>
       </div>
     </div>
+
+    <!-- History sidebar (permanent) -->
+    <aside id="history-sidebar">
+      <div class="sidebar-dz" id="sidebar-dz">
+        <input type="file" id="sidebar-dz-input" accept=".pdf,image/*" multiple style="display:none">
+        <div class="sdz-icon">📂</div>
+        <div class="sdz-title">Déposez votre fichier ici</div>
+        <div class="sdz-sub">PDF, images — ou cliquez pour parcourir</div>
+        <div class="sdz-file" id="sdz-filename" style="display:none"></div>
+      </div>
+      <div id="sidebar-thumbs"></div>
+      <div class="sidebar-clear-wrap">
+        <button id="clear-btn" class="sidebar-clear-btn">🗑 Tout effacer</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Tools drawer -->
+<div id="drawer-backdrop"></div>
+<div id="tools-drawer">
+  <div class="drawer-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <span style="font-size:13px;font-weight:700;color:var(--dim);letter-spacing:.8px;text-transform:uppercase">Outils</span>
+      <button onclick="closeDrawer()" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px" title="Fermer">✕</button>
+    </div>
+    <div class="home-section-title">Opérations rapides</div>
+    <div class="quick-grid" id="quick-grid" style="grid-template-columns:repeat(3,1fr)"></div>
+    <div class="home-section-title" style="margin-top:16px">Tous les outils</div>
+    <div class="quick-grid" id="all-grid" style="grid-template-columns:repeat(3,1fr)"></div>
   </div>
 </div>
 
 <!-- Global drag overlay -->
 <div id="drag-overlay">
   <div class="dg-inner">
-    <h3>⬇ Déposez votre PDF</h3>
+    <h3>⬇ Déposez votre fichier</h3>
     <p>Le fichier sera chargé dans l'opération active</p>
   </div>
 </div>
 
 <!-- Chain pill + overlay -->
-<button id="chain-pill">⤵ Utiliser ce résultat…</button>
+<button id="chain-pill">⤵ Réutiliser ce résultat…</button>
 <div id="chain-overlay">
   <div class="chain-modal">
     <h3>Envoyer le résultat vers…</h3>
@@ -293,14 +461,12 @@
 <!-- Shortcuts modal -->
 <div id="shortcuts-modal">
   <div class="shortcuts-box">
-    <h3>Raccourcis clavier</h3>
+    <h3>⌨ Raccourcis clavier</h3>
     <div class="sc-list">
-      <kbd>Ctrl + Enter</kbd><span>Soumettre le formulaire actif</span>
-      <kbd>← / →</kbd><span>Page précédente / suivante dans l'aperçu</span>
-      <kbd>I</kbd><span>Basculer vers l'onglet Fichier source</span>
-      <kbd>O</kbd><span>Basculer vers l'onglet Résultat</span>
-      <kbd>H</kbd><span>Ouvrir l'historique de session</span>
-      <kbd>Échap</kbd><span>Fermer les modals</span>
+      <kbd>Ctrl + Enter</kbd><span>Lancer l'opération active</span>
+      <kbd>← / →</kbd><span>Page précédente / suivante</span>
+      <kbd>E</kbd><span>Activer / désactiver le mode édition texte</span>
+      <kbd>Échap</kbd><span>Fermer les fenêtres</span>
       <kbd>?</kbd><span>Afficher / masquer cette aide</span>
     </div>
     <button class="modal-cancel" id="shortcuts-close">Fermer</button>
@@ -313,120 +479,284 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 // ── State ─────────────────────────────────────────────────────────────────
 let API_KEY = localStorage.getItem('quill_api_key') || '';
-let previewDoc = null, previewPage = 1, activeTab = 'input';
+let previewDoc = null, previewPage = 1, previewZoom = null;
 let inputBlob = null, outputBlob = null, lastOutputBlob = null;
 let xyMode = false, xyTargetX = null, xyTargetY = null, xyScale = 1;
+let editMode = true;
 let thumbCache = {};
-let sessionHistory = [];   // [{id, label, group, inputName, outputName, blob, url, ts}]
+let sessionHistory = [];
 let activePanelId = null;
 
 // ── PANELS ────────────────────────────────────────────────────────────────
 const PANELS = [
   { group:"Basique", items:[
-    { id:"merge",        label:"Fusionner",       desc:"Combiner plusieurs PDFs en un seul.",       endpoint:"/basic/merge",              rtype:"blob", dl:"merged.pdf",
+    { id:"merge",        icon:"🔗", label:"Fusionner",       desc:"Combiner plusieurs PDFs en un seul document.",  endpoint:"/basic/merge",              rtype:"blob", dl:"merged.pdf",
       fields:[{name:"files",label:"Fichiers PDF",type:"file",multiple:true,accept:".pdf"}] },
-    { id:"split",        label:"Diviser",          desc:"Découper un PDF par plages de pages.",      endpoint:"/basic/split",              rtype:"blob", dl:"split.zip",
+    { id:"split",        icon:"✂️",  label:"Diviser",          desc:"Extraire des plages de pages en fichiers séparés.", endpoint:"/basic/split",              rtype:"blob", dl:"split.zip",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"ranges",label:"Pages à extraire",type:"pages-picker",mode:"select",hint:"Laisser vide = une page par fichier"}] },
-    { id:"rotate",       label:"Rotation",         desc:"Faire pivoter des pages.",                  endpoint:"/basic/rotate",             rtype:"blob", dl:"rotated.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"degrees",label:"Degrés",type:"select",options:["90","180","270"]},{name:"pages",label:"Pages à pivoter",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
-    { id:"reorder",      label:"Réordonner",       desc:"Glissez les miniatures pour réordonner.",   endpoint:"/basic/reorder",            rtype:"blob", dl:"reordered.pdf",
+    { id:"rotate",       icon:"🔄", label:"Rotation",         desc:"Faire pivoter des pages à 90°, 180° ou 270°.",  endpoint:"/basic/rotate",             rtype:"blob", dl:"rotated.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"degrees",label:"Rotation",type:"select",options:["90","180","270"]},{name:"pages",label:"Pages à pivoter",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
+    { id:"reorder",      icon:"↕️",  label:"Réordonner",       desc:"Glissez les miniatures pour changer l'ordre des pages.", endpoint:"/basic/reorder",            rtype:"blob", dl:"reordered.pdf",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"order",label:"Ordre des pages",type:"pages-picker",mode:"reorder"}] },
-    { id:"delete-pages", label:"Supprimer pages",  desc:"Cocher les pages à supprimer.",             endpoint:"/basic/delete-pages",       rtype:"blob", dl:"output.pdf",
+    { id:"delete-pages", icon:"🗑️", label:"Supprimer pages",  desc:"Cochez les pages à retirer du document.",       endpoint:"/basic/delete-pages",       rtype:"blob", dl:"output.pdf",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"pages",label:"Pages à supprimer",type:"pages-picker",mode:"select"}] },
-    { id:"info",         label:"Métadonnées",      desc:"Lire les informations d'un PDF.",           endpoint:"/basic/info",               rtype:"json",
+    { id:"info",         icon:"ℹ️",  label:"Métadonnées",      desc:"Afficher les informations du PDF (auteur, pages, taille…).", endpoint:"/basic/info",               rtype:"json",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
-    { id:"extract-text", label:"Extraire texte",   desc:"Extraire le texte brut d'un PDF.",          endpoint:"/basic/extract-text",       rtype:"json",
+    { id:"extract-text", icon:"📝", label:"Extraire texte",   desc:"Extraire le contenu textuel du PDF.",           endpoint:"/basic/extract-text",       rtype:"json",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"pages",label:"Pages (optionnel)",type:"pages-picker",mode:"select"}] },
   ]},
   { group:"Sécurité", items:[
-    { id:"encrypt", label:"Chiffrer",   desc:"Protéger un PDF par mot de passe.", endpoint:"/security/encrypt", rtype:"blob", dl:"encrypted.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"password",label:"Mot de passe",type:"text",placeholder:"••••••••"}] },
-    { id:"decrypt", label:"Déchiffrer", desc:"Retirer la protection d'un PDF.",   endpoint:"/security/decrypt", rtype:"blob", dl:"decrypted.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"password",label:"Mot de passe",type:"text",placeholder:"••••••••"}] },
+    { id:"encrypt", icon:"🔒", label:"Chiffrer",   desc:"Protéger un PDF par mot de passe.", endpoint:"/security/encrypt", rtype:"blob", dl:"encrypted.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"password",label:"Mot de passe",type:"text",placeholder:"Choisissez un mot de passe fort"}] },
+    { id:"decrypt", icon:"🔓", label:"Déchiffrer", desc:"Supprimer la protection par mot de passe.", endpoint:"/security/decrypt", rtype:"blob", dl:"decrypted.pdf",
+      fields:[{name:"file",label:"Fichier PDF protégé",type:"file",accept:".pdf"},{name:"password",label:"Mot de passe actuel",type:"text",placeholder:"Mot de passe du document"}] },
   ]},
   { group:"Annotations", items:[
-    { id:"watermark",    label:"Filigrane",     desc:"Ajouter un filigrane textuel diagonal.", endpoint:"/annotations/watermark",    rtype:"blob", dl:"watermarked.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"text",label:"Texte",type:"text",placeholder:"CONFIDENTIEL"},{name:"opacity",label:"Opacité",type:"text",placeholder:"0.15"},{name:"angle",label:"Angle",type:"text",placeholder:"45"}] },
-    { id:"stamp",        label:"Tampon",        desc:"Apposer un tampon sur les pages.",       endpoint:"/annotations/stamp",        rtype:"blob", dl:"stamped.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"label",label:"Texte",type:"text",placeholder:"CONFIDENTIEL"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
-    { id:"add-text",     label:"Ajouter texte", desc:"Cliquez sur l'aperçu pour positionner.", endpoint:"/annotations/add-text",     rtype:"blob", dl:"annotated.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"text",label:"Texte",type:"text",placeholder:"Mon annotation"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"100"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
-    { id:"add-image-ann",label:"Insérer image", desc:"Cliquez sur l'aperçu pour positionner.", endpoint:"/annotations/add-image",   rtype:"blob", dl:"with_image.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"image",label:"Image (PNG/JPEG)",type:"file",accept:"image/*"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"100"},{name:"width",label:"Largeur (pt)",type:"text",placeholder:"100"},{name:"height",label:"Hauteur (pt)",type:"text",placeholder:"100"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
-    { id:"comment-ann",  label:"Commentaire",   desc:"Ajouter une note collante sur une page.", endpoint:"/annotations/comment",     rtype:"blob", dl:"commented.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"text",label:"Contenu du commentaire",type:"textarea",placeholder:"Mon commentaire…"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"50"},{name:"page",label:"Page",type:"text",placeholder:"1"},{name:"author",label:"Auteur",type:"text",placeholder:"Quill"}] },
-    { id:"page-numbers", label:"Numéroter",     desc:"Ajouter la numérotation automatique.",  endpoint:"/annotations/page-numbers", rtype:"blob", dl:"numbered.pdf",
+    { id:"watermark",    icon:"💧", label:"Filigrane texte",  desc:"Ajouter un filigrane diagonal sur toutes les pages.", endpoint:"/annotations/watermark",    rtype:"blob", dl:"watermarked.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"text",label:"Texte du filigrane",type:"text",placeholder:"CONFIDENTIEL"},{name:"opacity",label:"Opacité (0 à 1)",type:"text",placeholder:"0.15"},{name:"angle",label:"Angle (degrés)",type:"text",placeholder:"45"}] },
+    { id:"stamp",        icon:"🔖", label:"Tampon",           desc:"Apposer un tampon centré (APPROUVÉ, BROUILLON…).", endpoint:"/annotations/stamp",        rtype:"blob", dl:"stamped.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"label",label:"Texte du tampon",type:"text",placeholder:"CONFIDENTIEL"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
+    { id:"add-text",     icon:"✏️",  label:"Ajouter texte",   desc:"Insérer du texte libre — cliquez sur l'aperçu pour positionner.", endpoint:"/annotations/add-text",     rtype:"blob", dl:"annotated.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"text",label:"Texte à insérer",type:"text",placeholder:"Mon annotation"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"100"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
+    { id:"add-image-ann",icon:"🖼️", label:"Insérer image",   desc:"Coller une image (logo, cachet) — cliquez sur l'aperçu pour positionner.", endpoint:"/annotations/add-image",   rtype:"blob", dl:"with_image.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"image",label:"Image (PNG / JPEG)",type:"file",accept:"image/*"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"100"},{name:"width",label:"Largeur (pt)",type:"text",placeholder:"100"},{name:"height",label:"Hauteur (pt)",type:"text",placeholder:"100"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
+    { id:"comment-ann",  icon:"💬", label:"Commentaire",      desc:"Ajouter une note collante sur une page.", endpoint:"/annotations/comment",     rtype:"blob", dl:"commented.pdf",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"text",label:"Contenu de la note",type:"textarea",placeholder:"Mon commentaire…"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"50"},{name:"page",label:"Page",type:"text",placeholder:"1"},{name:"author",label:"Auteur",type:"text",placeholder:"Quill"}] },
+    { id:"page-numbers", icon:"🔢", label:"Numéroter pages",  desc:"Ajouter la numérotation automatique des pages.", endpoint:"/annotations/page-numbers", rtype:"blob", dl:"numbered.pdf",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"position",label:"Position",type:"select",options:["bottom-center","bottom-right","bottom-left","top-center","top-right","top-left"]},{name:"prefix",label:"Préfixe",type:"text",placeholder:"Page "},{name:"start",label:"Numéro de départ",type:"text",placeholder:"1"}] },
   ]},
   { group:"Extraction", items:[
-    { id:"extract-tables",     label:"Tableaux", desc:"Extraire les tableaux en CSV ou Excel.", endpoint:"/extraction/tables",   rtype:"blob", dl:"tables",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"fmt",label:"Format",type:"select",options:["csv","excel"]},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
-    { id:"extract-images-api", label:"Images",   desc:"Extraire les images embarquées.",        endpoint:"/extraction/images",   rtype:"blob", dl:"images.zip",
+    { id:"extract-tables",     icon:"📊", label:"Extraire tableaux",   desc:"Exporter les tableaux en CSV ou Excel.", endpoint:"/extraction/tables",   rtype:"blob", dl:"tables",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"fmt",label:"Format de sortie",type:"select",options:["csv","excel"]},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
+    { id:"extract-images-api", icon:"🖼️", label:"Extraire images",     desc:"Récupérer toutes les images embarquées dans le PDF.",        endpoint:"/extraction/images",   rtype:"blob", dl:"images.zip",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
-    { id:"extract-links",      label:"Liens",    desc:"Lister tous les hyperliens.",            endpoint:"/extraction/links",    rtype:"json",
+    { id:"extract-links",      icon:"🔗", label:"Extraire liens",      desc:"Lister tous les hyperliens du document.",            endpoint:"/extraction/links",    rtype:"json",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
-    { id:"detect-lang",        label:"Langue",   desc:"Détecter la langue du document.",        endpoint:"/extraction/language", rtype:"json",
+    { id:"detect-lang",        icon:"🌍", label:"Détecter la langue",  desc:"Identifier la langue principale du document.",        endpoint:"/extraction/language", rtype:"json",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
   ]},
   { group:"Formulaires", items:[
-    { id:"list-fields-api",  label:"Lister champs",     desc:"Afficher les champs interactifs.", endpoint:"/forms/list",    rtype:"json",
+    { id:"list-fields-api",  icon:"📋", label:"Lister les champs",     desc:"Afficher tous les champs de formulaire et leurs valeurs.", endpoint:"/forms/list",    rtype:"json",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
-    { id:"fill-form-api",    label:"Remplir formulaire", desc:'Remplir les champs (JSON).',      endpoint:"/forms/fill",    rtype:"blob", dl:"filled.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"data",label:"Données JSON",type:"textarea",placeholder:'{"name":"Alice","email":"alice@x.com"}'}] },
-    { id:"flatten-form-api", label:"Aplatir formulaire", desc:"Rendre les champs non éditables.",endpoint:"/forms/flatten", rtype:"blob", dl:"flattened.pdf",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
-    { id:"create-form-api",  label:"Créer formulaire",  desc:'Générer un PDF interactif depuis une liste de champs JSON.',endpoint:"/forms/create", rtype:"blob", dl:"form.pdf",
-      fields:[{name:"fields",label:"Champs (JSON)",type:"textarea",placeholder:'[{"name":"nom","type":"text","label":"Nom complet","x":50,"y":100},\n {"name":"email","type":"text","label":"Email","x":50,"y":150}]'}] },
+    { id:"fill-form-api",    icon:"📝", label:"Remplir formulaire",    desc:'Remplir les champs avec des données JSON.',      endpoint:"/forms/fill",    rtype:"blob", dl:"filled.pdf",
+      fields:[{name:"file",label:"Fichier PDF avec formulaire",type:"file",accept:".pdf"},{name:"data",label:'Données JSON {"champ":"valeur"}',type:"textarea",placeholder:'{"nom":"Alice","email":"alice@exemple.com"}'}] },
+    { id:"flatten-form-api", icon:"⬛", label:"Aplatir formulaire",    desc:"Convertir les champs en texte non modifiable.",endpoint:"/forms/flatten", rtype:"blob", dl:"flattened.pdf",
+      fields:[{name:"file",label:"Fichier PDF avec formulaire",type:"file",accept:".pdf"}] },
+    { id:"create-form-api",  icon:"📄", label:"Créer formulaire",      desc:'Générer un PDF interactif avec des champs personnalisés.',endpoint:"/forms/create", rtype:"blob", dl:"form.pdf",
+      fields:[{name:"fields",label:'Champs JSON [{"name":"…","type":"text","x":50,"y":100}]',type:"textarea",placeholder:'[{"name":"nom","type":"text","label":"Nom complet","x":50,"y":100,"width":200,"height":24},\n {"name":"email","type":"text","label":"Email","x":50,"y":150,"width":200,"height":24}]'}] },
   ]},
   { group:"OCR", items:[
-    { id:"ocr-pdf",    label:"PDF → Cherchable", desc:"Reconnaître le texte d'un PDF scanné (Tesseract requis).", endpoint:"/ocr/ocr", rtype:"blob", dl:"searchable.pdf",
-      fields:[{name:"file",label:"PDF scanné",type:"file",accept:".pdf"},{name:"lang",label:"Langue(s)",type:"text",placeholder:"fra+eng"},{name:"dpi",label:"DPI",type:"text",placeholder:"300"}] },
-    { id:"pdf-to-imgs-ocr", label:"PDF → Images", desc:"Exporter les pages en images PNG ou JPEG.", endpoint:"/ocr/pdf-to-images", rtype:"blob", dl:"pages.zip",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"fmt",label:"Format",type:"select",options:["png","jpg"]},{name:"dpi",label:"DPI",type:"text",placeholder:"150"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
+    { id:"ocr-pdf",      icon:"🔍", label:"PDF → Cherchable",   desc:"Reconnaître le texte d'un PDF scanné (Tesseract requis).", endpoint:"/ocr/ocr",          rtype:"blob", dl:"searchable.pdf",
+      fields:[{name:"file",label:"PDF scanné",type:"file",accept:".pdf"},{name:"lang",label:"Langue(s) Tesseract",type:"text",placeholder:"fra+eng"},{name:"dpi",label:"Résolution (DPI)",type:"text",placeholder:"300"}] },
+    { id:"pdf-to-imgs-ocr", icon:"📷", label:"PDF → Images",      desc:"Exporter chaque page en image PNG ou JPEG.", endpoint:"/ocr/pdf-to-images", rtype:"blob", dl:"pages.zip",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"fmt",label:"Format",type:"select",options:["png","jpg"]},{name:"dpi",label:"Résolution (DPI)",type:"text",placeholder:"150"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
   ]},
   { group:"Signatures", items:[
-    { id:"sign-pdf",   label:"Signer",           desc:"Cliquez sur l'aperçu pour placer la signature.", endpoint:"/sign/sign", rtype:"blob", dl:"signed.pdf",
+    { id:"sign-pdf",   icon:"✍️",  label:"Signer",           desc:"Apposer un bloc de signature visuel — cliquez sur l'aperçu pour le positionner.", endpoint:"/sign/sign", rtype:"blob", dl:"signed.pdf",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"name",label:"Nom du signataire",type:"text",placeholder:"Alice Martin"},{name:"reason",label:"Motif",type:"text",placeholder:"Approbation"},{name:"location",label:"Lieu",type:"text",placeholder:"Paris"},{name:"page",label:"Page",type:"text",placeholder:"1"},{name:"x",label:"X (pt)",type:"xy",axis:"x",placeholder:"50"},{name:"y",label:"Y (pt)",type:"xy",axis:"y",placeholder:"50"}] },
-    { id:"sign-list",  label:"Voir signatures",  desc:"Lister les annotations de signature existantes.", endpoint:"/sign/list",  rtype:"json",
+    { id:"sign-list",  icon:"🔎", label:"Voir signatures",   desc:"Lister toutes les signatures présentes dans le document.", endpoint:"/sign/list",  rtype:"json",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
   ]},
   { group:"Conversions", items:[
-    { id:"to-images-api",   label:"PDF → Images",   desc:"Convertir les pages en PNG ou JPEG.", endpoint:"/convert/to-images",   rtype:"blob", dl:"pages.zip",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"fmt",label:"Format",type:"select",options:["png","jpg"]},{name:"dpi",label:"DPI",type:"text",placeholder:"150"}] },
-    { id:"from-images-api", label:"Images → PDF",   desc:"Combiner des images en un seul PDF.", endpoint:"/convert/from-images", rtype:"blob", dl:"combined.pdf",
-      fields:[{name:"files",label:"Images",type:"file",multiple:true,accept:"image/*"}] },
-    { id:"to-markdown-api", label:"PDF → Markdown", desc:"Convertir un PDF en Markdown.",       endpoint:"/convert/to-markdown", rtype:"blob", dl:"doc.md",
+    { id:"to-images-api",   icon:"🖼️", label:"PDF → Images",    desc:"Convertir chaque page en fichier PNG ou JPEG.",  endpoint:"/convert/to-images",   rtype:"blob", dl:"pages.zip",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"fmt",label:"Format",type:"select",options:["png","jpg"]},{name:"dpi",label:"Résolution (DPI)",type:"text",placeholder:"150"}] },
+    { id:"from-images-api", icon:"📑", label:"Images → PDF",    desc:"Assembler des images en un seul PDF, une page par image.", endpoint:"/convert/from-images", rtype:"blob", dl:"combined.pdf",
+      fields:[{name:"files",label:"Images (PNG / JPEG)",type:"file",multiple:true,accept:"image/*"}] },
+    { id:"to-markdown-api", icon:"📄", label:"PDF → Markdown",  desc:"Convertir le contenu du PDF en texte Markdown.",  endpoint:"/convert/to-markdown", rtype:"blob", dl:"doc.md",
       fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"}] },
-    { id:"to-json-api",     label:"PDF → JSON",     desc:"Extraire la mise en page en JSON.",   endpoint:"/convert/to-json",     rtype:"json",
-      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes"}] },
+    { id:"to-json-api",     icon:"{ }", label:"PDF → JSON",     desc:"Extraire la mise en page structurée en JSON (mots, positions, polices).",   endpoint:"/convert/to-json",     rtype:"json",
+      fields:[{name:"file",label:"Fichier PDF",type:"file",accept:".pdf"},{name:"pages",label:"Pages",type:"pages-picker",mode:"select",hint:"Laisser vide = toutes les pages"}] },
   ]},
 ];
 
+// Opérations les plus courantes affichées sur la page d'accueil
+const QUICK_IDS = ["merge","split","watermark","sign-pdf","ocr-pdf","encrypt","extract-text","rotate"];
+
 // ── Build nav & panels ────────────────────────────────────────────────────
-const navEl = document.getElementById('nav');
+const navScroll = document.getElementById('nav-scroll');
 const mainEl = document.getElementById('main');
-const navSpacer = navEl.querySelector('.nav-spacer');
+const noResults = document.getElementById('nav-no-results');
 
 PANELS.forEach(group => {
+  const groupWrap = document.createElement('div');
+  groupWrap.className = 'nav-group';
+
   const lbl = document.createElement('div');
-  lbl.className = 'group-label'; lbl.textContent = group.group;
-  navEl.insertBefore(lbl, navSpacer);
+  lbl.className = 'group-label';
+  lbl.innerHTML = `${group.group}<span class="gl-arrow">▾</span>`;
+  lbl.onclick = () => {
+    lbl.classList.toggle('collapsed');
+    itemsWrap.classList.toggle('collapsed');
+  };
+
+  const itemsWrap = document.createElement('div');
+  itemsWrap.className = 'group-items';
+
   group.items.forEach(item => {
     const btn = document.createElement('button');
-    btn.textContent = item.label; btn.dataset.id = item.id;
+    btn.className = 'nav-item';
+    btn.dataset.id = item.id;
+    btn.dataset.label = (item.label + ' ' + item.desc + ' ' + group.group).toLowerCase();
+    btn.innerHTML = `<span class="nav-item-icon">${item.icon}</span>${item.label}`;
     btn.onclick = () => activate(item.id);
-    navEl.insertBefore(btn, navSpacer);
+    itemsWrap.appendChild(btn);
     mainEl.appendChild(buildPanel(item));
   });
+
+  groupWrap.appendChild(lbl);
+  groupWrap.appendChild(itemsWrap);
+  navScroll.insertBefore(groupWrap, noResults);
 });
 
-document.getElementById('nav-history').onclick = () => activate('__history');
+// ── Header search dropdown ────────────────────────────────────────────────
+(function(){
+  const inp = document.getElementById('nav-search');
+
+  // Build flat list of all tools from PANELS
+  const allTools = PANELS.flatMap(g => g.items.map(it => ({
+    id: it.id, label: it.label, icon: it.icon, group: g.group,
+    search: (it.label + ' ' + it.desc + ' ' + g.group).toLowerCase()
+  })));
+
+  // Dropdown container
+  const dd = document.createElement('div');
+  dd.id = 'search-dropdown';
+  dd.style.cssText = 'display:none;position:absolute;top:100%;left:0;width:280px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:500;max-height:320px;overflow-y:auto;padding:4px 0;margin-top:4px';
+  inp.parentElement.style.position = 'relative';
+  inp.after(dd);
+
+  const show = () => dd.style.display = 'block';
+  const hide = () => { dd.style.display = 'none'; inp.value = ''; };
+
+  inp.oninput = () => {
+    const q = inp.value.toLowerCase().trim();
+    dd.innerHTML = '';
+    if (!q) { dd.style.display = 'none'; return; }
+    const results = allTools.filter(t => t.search.includes(q)).slice(0, 12);
+    if (!results.length) {
+      dd.innerHTML = '<div style="padding:10px 14px;color:var(--dim);font-size:12px">Aucun outil trouvé</div>';
+    } else {
+      results.forEach(t => {
+        const el = document.createElement('button');
+        el.style.cssText = 'display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;color:var(--text);padding:8px 14px;cursor:pointer;font-size:13px;';
+        el.innerHTML = `<span style="width:20px;text-align:center;flex-shrink:0">${t.icon}</span><span>${t.label}</span><span style="margin-left:auto;font-size:11px;color:var(--dim)">${t.group}</span>`;
+        el.onmouseenter = () => el.style.background = 'var(--surface2)';
+        el.onmouseleave = () => el.style.background = '';
+        el.onclick = () => { activate(t.id); hide(); };
+        dd.appendChild(el);
+      });
+    }
+    show();
+  };
+
+  inp.onkeydown = e => {
+    if (e.key === 'Escape') { hide(); inp.blur(); }
+    if (e.key === 'Enter') {
+      const first = dd.querySelector('button');
+      if (first) { first.click(); }
+    }
+  };
+
+  document.addEventListener('mousedown', e => {
+    if (!inp.contains(e.target) && !dd.contains(e.target)) hide();
+  });
+})();
+
+
+// ── Home panel quick actions ───────────────────────────────────────────────
+function buildHomeGrids() {
+  const allItems = PANELS.flatMap(g => g.items.map(i => ({...i, group: g.group})));
+
+  const buildCard = (item) => {
+    const card = document.createElement('div');
+    card.className = 'quick-card';
+    card.innerHTML = `<div class="qc-icon">${item.icon}</div><div class="qc-label">${item.label}</div><div class="qc-group">${item.group}</div>`;
+    card.onclick = () => activate(item.id);
+    return card;
+  };
+
+  const quickGrid = document.getElementById('quick-grid');
+  QUICK_IDS.forEach(id => {
+    const item = allItems.find(i => i.id === id);
+    if (item) quickGrid.appendChild(buildCard(item));
+  });
+
+  const allGrid = document.getElementById('all-grid');
+  allItems.filter(i => !QUICK_IDS.includes(i.id)).forEach(item => allGrid.appendChild(buildCard(item)));
+}
+buildHomeGrids();
+
+// Home file drop
+const homeHero = document.getElementById('home-hero');
+const homeInput = document.getElementById('home-file-input');
+homeInput.onchange = () => {
+  const files = Array.from(homeInput.files);
+  if (!files.length) return;
+  const pdf = files.find(f => f.name.toLowerCase().endsWith('.pdf'));
+  if (pdf) { loadFile(pdf); }
+};
+homeHero.ondragover = e => { e.preventDefault(); homeHero.classList.add('drag-over'); };
+homeHero.ondragleave = () => homeHero.classList.remove('drag-over');
+homeHero.ondrop = e => {
+  e.preventDefault();
+  homeHero.classList.remove('drag-over');
+  const files = Array.from(e.dataTransfer.files);
+  const pdf = files.find(f => f.name.toLowerCase().endsWith('.pdf'));
+  if (pdf) loadFile(pdf);
+};
+
+function loadFile(file) {
+  inputBlob = file; outputBlob = null; thumbCache = {};
+  const sidebar = document.getElementById('history-sidebar');
+  sidebar.classList.add('visible');
+  document.querySelector('.layout').classList.add('has-sidebar');
+  setSidebarHeight();
+  switchTab('input');
+  const fn = document.getElementById('sdz-filename');
+  if (fn) { fn.textContent = '📄 ' + file.name; fn.style.display = 'block'; }
+  renderSidebarThumbs();
+  toast('Fichier chargé', file.name, 'ok', 2500);
+  dbSet('inputFile', file).catch(()=>{});
+}
+
+
+async function renderSidebarThumbs() {
+  const container = document.getElementById('sidebar-thumbs');
+  if (!container || !inputBlob) return;
+  container.innerHTML = '';
+  try {
+    const doc = await pdfjsLib.getDocument({data: await inputBlob.arrayBuffer()}).promise;
+    const THUMB_W = 100;
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const vp0 = page.getViewport({scale:1});
+      const scale = THUMB_W / vp0.width;
+      const vp = page.getViewport({scale});
+      const wrap = document.createElement('div');
+      wrap.className = 'stb' + (i === previewPage ? ' active' : '');
+      wrap.dataset.page = i;
+      const canvas = document.createElement('canvas');
+      canvas.width = vp.width; canvas.height = vp.height;
+      canvas.style.aspectRatio = `${vp.width} / ${vp.height}`;
+      await page.render({canvasContext: canvas.getContext('2d'), viewport: vp}).promise;
+      const num = document.createElement('div');
+      num.className = 'stb-num'; num.textContent = i;
+      wrap.appendChild(canvas); wrap.appendChild(num);
+      wrap.onclick = () => {
+        previewPage = i; updatePageControls(); renderPage(i);
+        container.querySelectorAll('.stb').forEach(t => t.classList.remove('active'));
+        wrap.classList.add('active');
+      };
+      container.appendChild(wrap);
+    }
+  } catch(e) { container.innerHTML = ''; }
+}
 
 // ── Panel builder ─────────────────────────────────────────────────────────
 function buildPanel(item) {
   const div = document.createElement('div');
   div.id = 'panel-' + item.id; div.className = 'panel';
-  div.innerHTML = `<h2>${item.label}</h2><p class="desc">${item.desc}</p>
+  div.innerHTML = `<h2>${item.icon} ${item.label}</h2><p class="desc">${item.desc}</p>
     <form class="form-grid" id="form-${item.id}"></form>
     <pre class="json-out" id="json-${item.id}"></pre>`;
   const form = div.querySelector('form');
@@ -435,7 +765,7 @@ function buildPanel(item) {
   if (hasXY) {
     const hint = document.createElement('p');
     hint.className = 'xy-hint';
-    hint.textContent = '🎯 Chargez un PDF puis cliquez sur l\'aperçu pour placer automatiquement';
+    hint.textContent = '🎯 Chargez un PDF puis cliquez sur l\'aperçu pour positionner';
     form.appendChild(hint);
   }
   const actions = document.createElement('div'); actions.className = 'form-actions';
@@ -463,7 +793,7 @@ function buildDropZone(f, item) {
   const dz = document.createElement('div'); dz.className = 'drop-zone';
   const inp = document.createElement('input'); inp.type='file'; inp.name=f.name; inp.accept=f.accept||''; if(f.multiple) inp.multiple=true;
   dz.innerHTML = `<div class="dz-text"><strong>Cliquer</strong> ou glisser-déposer</div>
-    <div class="dz-hint">${f.accept||'tous fichiers'}${f.multiple?' — plusieurs':''}</div>
+    <div class="dz-hint">${f.accept||'tous fichiers'}${f.multiple?' — plusieurs fichiers acceptés':''}</div>
     <div class="dz-files" id="dzf-${item.id}-${f.name}"></div>`;
   dz.appendChild(inp);
   const fl = dz.querySelector('.dz-files');
@@ -522,12 +852,10 @@ function fillPicker(picker, numPages) {
   const order = Array.from({length:numPages},(_,i)=>i+1);
   let selected = new Set();
   let dragSrc = null;
-
   const updateHidden = () => {
     if (mode==='reorder') hidden.value=order.join(',');
     else hidden.value=[...selected].sort((a,b)=>a-b).join(',');
   };
-
   const render = () => {
     grid.innerHTML = '';
     order.forEach((pageNum, idx) => {
@@ -556,23 +884,21 @@ function fillPicker(picker, numPages) {
 }
 
 // ── Preview ───────────────────────────────────────────────────────────────
-document.getElementById('tab-input').onclick = () => switchTab('input');
-document.getElementById('tab-output').onclick = () => switchTab('output');
-
 function switchTab(tab) {
-  activeTab=tab;
-  document.getElementById('tab-input').classList.toggle('active',tab==='input');
-  document.getElementById('tab-output').classList.toggle('active',tab==='output');
-  const blob=tab==='input'?inputBlob:outputBlob;
-  if (blob) renderPDF(blob); else showPlaceholder(tab==='output'?'Le résultat apparaîtra ici':'Sélectionnez un fichier\npour voir l\'aperçu');
+  const blob = tab==='output' ? (outputBlob||inputBlob) : inputBlob;
+  if (blob) renderPDF(blob);
+  else showPlaceholder('', true);
 }
 
 async function renderPDF(blob) {
   const body=document.getElementById('preview-body');
   body.innerHTML='<div class="preview-placeholder"><span>Chargement…</span></div>';
+  // Update filename display
+  const name = blob?.name || '—';
+  document.getElementById('preview-filename').textContent = name;
   try {
     const doc=await pdfjsLib.getDocument({data:await blob.arrayBuffer()}).promise;
-    previewDoc=doc; previewPage=1; updatePageControls(); await renderPage(previewPage);
+    previewDoc=doc; previewPage=1; previewZoom=null; updatePageControls(); await renderPage(previewPage);
   } catch(e) {
     body.innerHTML=`<div class="preview-placeholder"><span>Aperçu indisponible</span></div>`;
   }
@@ -583,7 +909,13 @@ async function renderPage(num) {
   body.innerHTML='';
   const page=await previewDoc.getPage(num);
   const vp0=page.getViewport({scale:1});
-  const scale=(body.clientWidth-28)/vp0.width;
+  // Fit-to-page par défaut : on prend le plus petit ratio (largeur ou hauteur)
+  if(previewZoom===null){
+    const sw=(body.clientWidth-28)/vp0.width;
+    const sh=(body.clientHeight-28)/vp0.height;
+    previewZoom=Math.min(sw,sh);
+  }
+  const scale=previewZoom;
   xyScale=scale;
   const vp=page.getViewport({scale});
   const wrap=document.createElement('div');
@@ -593,6 +925,31 @@ async function renderPage(num) {
   wrap.appendChild(canvas); wrap.appendChild(xhair);
   body.appendChild(wrap);
   await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+
+  // Text layer — positionnement manuel pour alignement parfait avec le PDF
+  try {
+    const textContent = await page.getTextContent();
+    const tl = document.createElement('div');
+    tl.className = 'text-layer edit-active';
+    tl.style.cssText = `position:absolute;top:0;left:0;width:${vp.width}px;height:${vp.height}px;overflow:hidden;`;
+    wrap.appendChild(tl);
+    for (const item of textContent.items) {
+      if (!item.str || !item.str.trim()) continue;
+      // Applique la transformation viewport → coordonnées CSS
+      const mat = pdfjsLib.Util.transform(vp.transform, item.transform);
+      const cx = mat[4];         // x CSS du début de ligne (origine texte)
+      const cy = mat[5];         // y CSS de la baseline
+      const fontH = Math.abs(mat[3]);  // hauteur police en px CSS
+      if (fontH < 2) continue;
+      const wPx = Math.max((item.width || 0) * vp.scale, 4);
+      const span = document.createElement('span');
+      span.textContent = item.str;
+      span.style.cssText = `position:absolute;left:${cx}px;top:${cy - fontH}px;width:${wPx}px;height:${fontH}px;font-size:${fontH}px;color:transparent;white-space:pre;pointer-events:auto;cursor:text;line-height:1;`;
+      span.onclick = e => { e.stopPropagation(); showInlineEditor(wrap, span, vp, num); };
+      tl.appendChild(span);
+    }
+  } catch(err) { console.warn('text layer:', err); }
+
   wrap.onmousemove=e=>{
     if(!xyMode)return;
     const r=canvas.getBoundingClientRect();
@@ -616,34 +973,257 @@ function updatePageControls() {
   const t=previewDoc?.numPages||0;
   document.getElementById('prev-page').disabled=previewPage<=1;
   document.getElementById('next-page').disabled=previewPage>=t;
-  document.getElementById('page-info').textContent=t?`${previewPage} / ${t}`:'—';
+  document.getElementById('page-info').textContent=t?`${previewPage}/${t}`:'—';
 }
 
-document.getElementById('prev-page').onclick=async()=>{if(previewPage>1){previewPage--;updatePageControls();await renderPage(previewPage);}};
-document.getElementById('next-page').onclick=async()=>{if(previewDoc&&previewPage<previewDoc.numPages){previewPage++;updatePageControls();await renderPage(previewPage);}};
+function updateSidebarActive(p){document.getElementById('sidebar-thumbs')?.querySelectorAll('.stb').forEach(t=>t.classList.toggle('active',+t.dataset.page===p));}
+document.getElementById('prev-page').onclick=async()=>{if(previewPage>1){previewPage--;updatePageControls();await renderPage(previewPage);updateSidebarActive(previewPage);}};
+document.getElementById('next-page').onclick=async()=>{if(previewDoc&&previewPage<previewDoc.numPages){previewPage++;updatePageControls();await renderPage(previewPage);updateSidebarActive(previewPage);}};
+document.getElementById('zoom-in').onclick=()=>{if(!previewDoc)return;previewZoom=(previewZoom||1)*1.25;renderPage(previewPage);};
+document.getElementById('zoom-out').onclick=()=>{if(!previewDoc)return;previewZoom=(previewZoom||1)*0.8;renderPage(previewPage);};
+document.getElementById('zoom-fit').onclick=()=>{if(!previewDoc)return;previewZoom=null;renderPage(previewPage);};
+// ── Pan (espace + glisser) ────────────────────────────────────────────────
+(()=>{
+  const body=document.getElementById('preview-body');
+  let panning=false, spaceDown=false, startX=0, startY=0, scrollX=0, scrollY=0;
 
-function showPlaceholder(msg) {
+  window.addEventListener('keydown',e=>{
+    if(e.code!=='Space')return;
+    const tag=document.activeElement.tagName.toLowerCase();
+    if(tag==='input'||tag==='textarea'||document.activeElement.contentEditable==='true')return;
+    e.preventDefault();
+    spaceDown=true;
+    body.style.cursor='grab';
+  });
+  window.addEventListener('keyup',e=>{
+    if(e.code!=='Space')return;
+    spaceDown=false;
+    if(!panning)body.style.cursor='';
+    panning=false;
+  });
+  body.addEventListener('mousedown',e=>{
+    if(!spaceDown)return;
+    e.preventDefault();
+    panning=true;
+    startX=e.clientX; startY=e.clientY;
+    scrollX=body.scrollLeft; scrollY=body.scrollTop;
+    body.style.cursor='grabbing';
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!panning)return;
+    body.scrollLeft=scrollX-(e.clientX-startX);
+    body.scrollTop =scrollY-(e.clientY-startY);
+  });
+  window.addEventListener('mouseup',()=>{
+    if(!panning)return;
+    panning=false;
+    body.style.cursor=spaceDown?'grab':'';
+  });
+})();
+
+document.getElementById('preview-body').addEventListener('wheel',e=>{
+  if(!e.ctrlKey||!previewDoc)return;
+  e.preventDefault();
+  previewZoom=(previewZoom||1)*(e.deltaY<0?1.1:0.9);
+  previewZoom=Math.max(0.1,Math.min(previewZoom,10));
+  renderPage(previewPage);
+},{passive:false});
+
+function showPlaceholder(msg, homeMode=false) {
   previewDoc=null;
+  document.getElementById('preview-filename').textContent='—';
+  if (homeMode) {
+    const body = document.getElementById('preview-body');
+    body.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding-bottom:8vh"><div class="preview-dropzone" id="preview-dz">
+      <div class="dz-icon">📂</div>
+      <h3>Déposez votre fichier ici</h3>
+      <p>PDF, images — ou cliquez pour parcourir</p>
+      <input type="file" id="preview-dz-input" accept=".pdf,image/*" multiple style="display:none">
+    </div></div>`;
+    const dz = body.querySelector('#preview-dz');
+    const inp = body.querySelector('#preview-dz-input');
+    dz.onclick = () => inp.click();
+    inp.onchange = () => { const f=Array.from(inp.files).find(f=>f.name.toLowerCase().endsWith('.pdf')); if(f) loadFile(f); };
+    dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag-over'); };
+    dz.ondragleave = () => dz.classList.remove('drag-over');
+    dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag-over'); const f=Array.from(e.dataTransfer.files).find(f=>f.name.toLowerCase().endsWith('.pdf')); if(f) loadFile(f); };
+    return;
+  }
   document.getElementById('preview-body').innerHTML=`<div class="preview-placeholder">
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
-    </svg><span>${msg.replace(/\n/g,'<br>')}</span></div>`;
+    </svg><p>${msg.replace(/\n/g,'<br>')}</p></div>`;
   document.getElementById('page-info').textContent='—';
   document.getElementById('prev-page').disabled=true;
   document.getElementById('next-page').disabled=true;
+}
+
+
+// ── Inline text editor ────────────────────────────────────────────────────
+function showInlineEditor(wrap, span, vp, pageNum) {
+  // Close any existing editor
+  wrap.querySelector('.inline-editor')?.remove();
+  wrap.querySelector('.text-editor-toolbar')?.remove();
+  wrap.querySelectorAll('.tl-selected').forEach(s => s.classList.remove('tl-selected'));
+
+  span.classList.add('tl-selected');
+
+  const wrapRect = wrap.getBoundingClientRect();
+  const spanRect = span.getBoundingClientRect();
+  const cssX = spanRect.left - wrapRect.left;
+  const cssY = spanRect.top - wrapRect.top;
+  const cssW = Math.max(spanRect.width, 40);
+  const cssH = Math.max(spanRect.height, 14);
+
+  // Convert CSS pixels → PyMuPDF coordinates.
+  // For a standard (unrotated) page: mupdfX = cssX / scale, mupdfY = cssY / scale.
+  // This holds because CSS Y is already measured top-down, same as PyMuPDF.
+  const s = vp.scale;
+  const MARGIN = 3;
+  const bx0 = cssX / s - MARGIN;
+  const by0 = cssY / s - MARGIN;
+  const bx1 = (cssX + cssW) / s + MARGIN;
+  const by1 = (cssY + cssH) / s + MARGIN;
+
+  const originalText = span.textContent;
+  const spanStyle = getComputedStyle(span);
+  const fontSize_css = parseFloat(spanStyle.fontSize) || 12;
+  const fontSize_pt = Math.round(fontSize_css / s);
+
+  // ── Toolbar ──
+  const toolbar = document.createElement('div');
+  toolbar.className = 'text-editor-toolbar';
+  toolbar.style.left = cssX + 'px';
+  toolbar.style.top  = cssY + 'px';
+  toolbar.innerHTML = `
+    <span class="tet-info">${fontSize_pt}pt</span>
+    <span class="tet-sep"></span>
+    <span class="tet-hint">Entrée&nbsp;=&nbsp;✓&nbsp;&nbsp;Échap&nbsp;=&nbsp;✗</span>
+    <span class="tet-sep"></span>
+    <button class="tet-btn tet-confirm">✓ Confirmer</button>
+    <button class="tet-btn tet-cancel">✗ Annuler</button>`;
+  wrap.appendChild(toolbar);
+
+  // ── Contenteditable editor ──
+  const editor = document.createElement('div');
+  editor.className = 'inline-editor';
+  editor.contentEditable = 'true';
+  editor.textContent = originalText;
+  editor.style.left     = cssX + 'px';
+  editor.style.top      = cssY + 'px';
+  editor.style.minWidth = cssW + 'px';
+  editor.style.minHeight= cssH + 'px';
+  editor.style.fontSize = fontSize_css + 'px';
+  editor.style.lineHeight = spanStyle.lineHeight;
+  wrap.appendChild(editor);
+
+  // Focus and select all text
+  editor.focus();
+  const rng = document.createRange();
+  rng.selectNodeContents(editor);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(rng);
+
+  const getText = () => (editor.innerText || '').replace(/[\r\n]+$/, '').trim();
+
+  let done = false;
+
+  const close = () => {
+    done = true;
+    editor.remove();
+    toolbar.remove();
+    span.classList.remove('tl-selected', 'tl-loading');
+    document.removeEventListener('mousedown', onOutside, true);
+  };
+
+  const cancel = () => { if (!done) close(); };
+
+  const commit = async () => {
+    if (done) return;
+    const newText = getText();
+    if (!newText || newText === originalText) { close(); return; }
+    done = true;
+    document.removeEventListener('mousedown', onOutside, true);
+
+    // Loading state
+    editor.contentEditable = 'false';
+    editor.style.opacity = '0.55';
+    toolbar.innerHTML = `<span class="tet-info">Enregistrement…</span>
+      <span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(108,99,255,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite"></span>`;
+    span.classList.add('tl-loading');
+    span.classList.remove('tl-selected');
+
+    try {
+      const src = outputBlob || inputBlob;
+      if (!src) throw new Error('Aucun fichier chargé');
+      const result = await callReplaceText(src, pageNum, bx0, by0, bx1, by1, newText);
+      close();
+      setOutputBlob(result, 'edited.pdf');
+      const url = URL.createObjectURL(result);
+      showChainPill();
+      addToHistory({ label:'Édition texte', inputName:src?.name||'fichier.pdf', outputName:'edited.pdf', blob:result, url, ts:Date.now() });
+      toast('Texte modifié', 'Résultat prêt', 'ok', 4000);
+      switchTab('output');
+    } catch (err) {
+      // Revert to editable state on error
+      done = false;
+      editor.contentEditable = 'true';
+      editor.style.opacity = '1';
+      span.classList.remove('tl-loading');
+      span.classList.add('tl-selected');
+      toolbar.innerHTML = `
+        <span class="tet-info" style="color:var(--err)">${err.message.substring(0,50)}</span>
+        <span class="tet-sep"></span>
+        <button class="tet-btn tet-confirm">✓ Réessayer</button>
+        <button class="tet-btn tet-cancel">✗ Annuler</button>`;
+      toolbar.querySelector('.tet-confirm').onclick = () => { done = false; commit(); };
+      toolbar.querySelector('.tet-cancel').onclick = cancel;
+      editor.focus();
+      document.addEventListener('mousedown', onOutside, true);
+    }
+  };
+
+  toolbar.querySelector('.tet-confirm').onclick = () => commit();
+  toolbar.querySelector('.tet-cancel').onclick = cancel;
+
+  editor.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    else if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
+  });
+
+  // Click outside → commit
+  const onOutside = e => {
+    if (!editor.contains(e.target) && !toolbar.contains(e.target) && !span.contains(e.target)) {
+      document.removeEventListener('mousedown', onOutside, true);
+      commit();
+    }
+  };
+  setTimeout(() => document.addEventListener('mousedown', onOutside, true), 150);
+}
+
+async function callReplaceText(blob, page, x0, y0, x1, y1, newText) {
+  const fd = new FormData();
+  fd.append('file', blob, blob.name||'input.pdf');
+  fd.append('page', page); fd.append('x0', x0); fd.append('y0', y0); fd.append('x1', x1); fd.append('y1', y1);
+  fd.append('new_text', newText);
+  const resp = await fetch('/edit/replace-text', { method:'POST', headers:{'X-API-Key':API_KEY}, body:fd });
+  if (!resp.ok) { const e=await resp.json().catch(()=>({detail:resp.statusText})); throw new Error(e.detail); }
+  return resp.blob();
 }
 
 function activateXY(panelId) {
   xyMode=true;
   xyTargetX=document.getElementById(`xy-${panelId}-x`);
   xyTargetY=document.getElementById(`xy-${panelId}-y`);
-  document.getElementById('xy-bar').classList.add('visible');
-  if(inputBlob&&activeTab!=='input') switchTab('input');
-  else if(previewDoc) renderPage(previewPage);
+  const bar=document.getElementById('xy-bar');
+  bar.textContent='🎯 Cliquez sur l\'aperçu pour placer l\'élément';
+  bar.classList.add('visible');
+  if(previewDoc) renderPage(previewPage);
 }
 function deactivateXY() {
   xyMode=false; xyTargetX=null; xyTargetY=null;
-  document.getElementById('xy-bar').classList.remove('visible');
+  if(!editMode) document.getElementById('xy-bar').classList.remove('visible');
   if(previewDoc) renderPage(previewPage);
 }
 
@@ -661,26 +1241,25 @@ function toast(title, msg='', type='ok', duration=4000) {
   setTimeout(()=>dismissToast(el), duration);
   return el;
 }
-function dismissToast(el) {
-  el.classList.add('out');
-  setTimeout(()=>el.remove(), 250);
-}
+function dismissToast(el) { el.classList.add('out'); setTimeout(()=>el.remove(),250); }
 
 // ── Global drag & drop ────────────────────────────────────────────────────
-let dragDepth=0;
-window.addEventListener('dragenter',e=>{
-  if(!e.dataTransfer.types.includes('Files'))return;
-  dragDepth++; document.getElementById('drag-overlay').classList.add('visible');
-});
-window.addEventListener('dragleave',()=>{
-  dragDepth--; if(dragDepth<=0){dragDepth=0;document.getElementById('drag-overlay').classList.remove('visible');}
-});
+let _dragHideTimer=null;
+const _showDragOverlay=()=>{ clearTimeout(_dragHideTimer); document.getElementById('drag-overlay').classList.add('visible'); };
+const _hideDragOverlay=()=>{ _dragHideTimer=setTimeout(()=>document.getElementById('drag-overlay').classList.remove('visible'),80); };
+window.addEventListener('dragenter',e=>{ if(e.dataTransfer.types.includes('Files')) _showDragOverlay(); });
+window.addEventListener('dragleave',e=>{ if(e.relatedTarget===null||!document.documentElement.contains(e.relatedTarget)) _hideDragOverlay(); });
 window.addEventListener('dragover',e=>e.preventDefault());
 window.addEventListener('drop',e=>{
-  e.preventDefault(); dragDepth=0; document.getElementById('drag-overlay').classList.remove('visible');
-  if(!activePanelId||activePanelId==='__history')return;
+  e.preventDefault(); clearTimeout(_dragHideTimer); document.getElementById('drag-overlay').classList.remove('visible');
   const files=Array.from(e.dataTransfer.files);
   if(!files.length)return;
+  // Accueil ou historique : charger le premier PDF trouvé
+  if(!activePanelId||activePanelId==='__home'){
+    const pdf=files.find(f=>f.name.toLowerCase().endsWith('.pdf'));
+    if(pdf) loadFile(pdf);
+    return;
+  }
   const panel=document.getElementById('panel-'+activePanelId);
   if(!panel)return;
   const inp=panel.querySelector('input[type="file"]');
@@ -693,11 +1272,9 @@ window.addEventListener('drop',e=>{
 // ── History ───────────────────────────────────────────────────────────────
 function addToHistory(entry) {
   sessionHistory.unshift(entry);
-  const badge=document.getElementById('history-badge');
-  badge.textContent=sessionHistory.length; badge.style.display='inline';
+  document.querySelector('.layout').classList.add('has-history');
   renderHistory();
 }
-
 function renderHistory() {
   const el=document.getElementById('history-content');
   if(!sessionHistory.length){el.innerHTML='<div class="history-empty">Aucune opération pour l\'instant.</div>';return;}
@@ -710,10 +1287,9 @@ function renderHistory() {
       <div class="hi-files">📄 <span>${h.inputName}</span> → <span>${h.outputName}</span></div>
       <div class="hi-actions">
         <a class="hi-dl" href="${h.url}" download="${h.outputName}">⬇ Télécharger</a>
-        <button class="hi-use" data-idx="${i}">⤵ Utiliser comme source</button>
+        <button class="hi-use" data-idx="${i}">⤵ Réutiliser</button>
       </div>`;
     item.querySelector('.hi-use').onclick=()=>{
-      document.getElementById('chain-pill').classList.remove('visible');
       lastOutputBlob=h.blob; buildChainOps(); document.getElementById('chain-overlay').classList.add('visible');
     };
     list.appendChild(item);
@@ -742,7 +1318,7 @@ async function submitForm(item, form) {
       const dlLink=`<a href="${url}" download="${filename}">⬇ Télécharger ${filename}</a>`;
       toast('Opération réussie',dlLink,'ok',8000);
       if(ct.includes('pdf')||filename.endsWith('.pdf')){
-        lastOutputBlob=blob; outputBlob=blob; switchTab('output'); showChainPill();
+        setOutputBlob(blob, filename); switchTab('output'); showChainPill();
         addToHistory({label:item.label,inputName,outputName:filename,blob,url,ts:Date.now()});
       }
     } else {
@@ -754,6 +1330,19 @@ async function submitForm(item, form) {
     toast('Erreur',err.message,'fail',6000);
   } finally {
     btn.disabled=false; btn.textContent='Lancer';
+  }
+}
+
+function setOutputBlob(blob, filename) {
+  outputBlob = blob; lastOutputBlob = blob;
+  const btn = document.getElementById('dl-btn');
+  if (blob) {
+    btn.href = URL.createObjectURL(blob);
+    btn.download = filename || 'resultat.pdf';
+    btn.classList.add('visible');
+  } else {
+    btn.classList.remove('visible');
+    btn.href = '';
   }
 }
 
@@ -769,7 +1358,7 @@ function buildChainOps(){
     const ff=item.fields.find(f=>f.type==='file'&&!f.multiple);
     if(!ff)return;
     const btn=document.createElement('button'); btn.className='chain-op-btn';
-    btn.innerHTML=`<strong>${item.label}</strong><br><span style="font-size:11px;color:var(--dim)">${group.group}</span>`;
+    btn.innerHTML=`<span>${item.icon}</span><div><strong>${item.label}</strong><br><span style="font-size:11px;color:var(--dim)">${group.group}</span></div>`;
     btn.onclick=()=>injectChain(item,ff.name);
     c.appendChild(btn);
   }));
@@ -787,16 +1376,46 @@ async function injectChain(item, fieldName){
   toast(`Résultat chargé dans "${item.label}"`,'','ok',2500);
 }
 
+// ── Sidebar drop zone ─────────────────────────────────────────────────────
+(function(){
+  const dz = document.getElementById('sidebar-dz');
+  const inp = document.getElementById('sidebar-dz-input');
+  dz.onclick = () => inp.click();
+  inp.onchange = () => { const f = Array.from(inp.files).find(f => f.name.toLowerCase().endsWith('.pdf')); if(f) loadFile(f); };
+  dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag-over'); };
+  dz.ondragleave = () => dz.classList.remove('drag-over');
+  dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag-over'); const f = Array.from(e.dataTransfer.files).find(f => f.name.toLowerCase().endsWith('.pdf')); if(f) loadFile(f); };
+})();
+
+// ── Drawer ────────────────────────────────────────────────────────────────
+function openDrawer(){
+  document.getElementById('tools-drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('tools-drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+document.getElementById('burger-btn').onclick = openDrawer;
+document.getElementById('drawer-backdrop').onclick = closeDrawer;
+
 // ── Navigation ────────────────────────────────────────────────────────────
 function activate(id){
+  closeDrawer();
   activePanelId=id;
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.hdr-nav').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const btn=document.querySelector(`nav button[data-id="${id}"]`);
-  if(btn)btn.classList.add('active');
+  const hdrBtn=document.querySelector(`.hdr-nav[data-id="${id}"]`);
+  if(hdrBtn)hdrBtn.classList.add('active');
   const panel=document.getElementById('panel-'+id);
   if(panel)panel.classList.add('active');
-  if(id==='__history'){renderHistory();deactivateXY();return;}
+  const layout = document.querySelector('.layout');
+  if(id==='__home'){
+    layout.classList.add('home-mode');
+    if(!inputBlob) showPlaceholder('',true);
+    deactivateXY(); return;
+  }
+  layout.classList.remove('home-mode');
   const hasXY=panel&&panel.querySelector('input[data-axis]');
   if(hasXY&&inputBlob)activateXY(id); else deactivateXY();
 }
@@ -805,41 +1424,34 @@ function activate(id){
 window.addEventListener('keydown', e => {
   const tag=document.activeElement.tagName.toLowerCase();
   const typing=tag==='input'||tag==='textarea'||tag==='select';
-
-  // Ctrl+Enter → submit active form
   if(e.ctrlKey&&e.key==='Enter'){
-    if(activePanelId&&activePanelId!=='__history'){
+    if(activePanelId&&activePanelId!=='__history'&&activePanelId!=='__home'){
       const form=document.getElementById('form-'+activePanelId);
       if(form){e.preventDefault();form.requestSubmit();}
     }
     return;
   }
-
-  if(typing)return; // don't intercept other keys while typing
-
-  // Arrow keys → preview pagination
+  if(typing)return;
   if(e.key==='ArrowLeft'&&previewPage>1){e.preventDefault();document.getElementById('prev-page').click();}
   if(e.key==='ArrowRight'&&previewDoc&&previewPage<previewDoc.numPages){e.preventDefault();document.getElementById('next-page').click();}
-
-  // I/O → switch preview tab
-  if(e.key==='i'||e.key==='I'){switchTab('input');}
-  if(e.key==='o'||e.key==='O'){switchTab('output');}
-
-  // H → history
-  if(e.key==='h'||e.key==='H'){activate('__history');}
-
-  // ? → shortcuts modal
-  if(e.key==='?'){document.getElementById('shortcuts-modal').classList.toggle('visible');}
-
-  // Escape → close modals
+  if(e.key==='?')document.getElementById('shortcuts-modal').classList.toggle('visible');
   if(e.key==='Escape'){
+    closeDrawer();
     document.getElementById('chain-overlay').classList.remove('visible');
     document.getElementById('shortcuts-modal').classList.remove('visible');
   }
 });
-
 document.getElementById('shortcuts-close').onclick=()=>document.getElementById('shortcuts-modal').classList.remove('visible');
 document.getElementById('shortcuts-modal').onclick=e=>{if(e.target===document.getElementById('shortcuts-modal'))document.getElementById('shortcuts-modal').classList.remove('visible');};
+
+// ── IndexedDB persistence ─────────────────────────────────────────────────
+(()=>{
+  const DB='quill_db', STORE='files', VER=1;
+  function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,VER);r.onupgradeneeded=e=>e.target.result.createObjectStore(STORE);r.onsuccess=e=>res(e.target.result);r.onerror=rej;});}
+  window.dbSet=async(k,v)=>{const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(v,k);tx.oncomplete=res;tx.onerror=rej;});};
+  window.dbGet=async(k)=>{const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readonly');const r=tx.objectStore(STORE).get(k);r.onsuccess=e=>res(e.target.result);r.onerror=rej;});};
+  window.dbDel=async(k)=>{const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(k);tx.oncomplete=res;tx.onerror=rej;});};
+})();
 
 // ── Auth ──────────────────────────────────────────────────────────────────
 async function tryLogin(key){const r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key})});return r.ok;}
@@ -853,27 +1465,52 @@ document.getElementById('login-btn').onclick=async()=>{
   else document.getElementById('login-err').style.display='block';
 };
 document.getElementById('login-key').onkeydown=e=>{if(e.key==='Enter')document.getElementById('login-btn').click();};
+function setSidebarHeight(){
+  const hdr=document.querySelector('header');
+  const sb=document.getElementById('history-sidebar');
+  if(sb.classList.contains('visible'))
+    sb.style.height=(window.innerHeight-hdr.getBoundingClientRect().height)+'px';
+}
+window.addEventListener('resize',setSidebarHeight);
+
 function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
   const m=API_KEY.slice(0,4)+'••••'+API_KEY.slice(-4);
   document.getElementById('key-display').textContent=m;
+  dbGet('inputFile').then(file=>{
+    if(file) loadFile(file);
+  }).catch(()=>{});
 }
 document.getElementById('key-display').onclick=()=>{
   navigator.clipboard.writeText(API_KEY);
   const el=document.getElementById('key-display');
   el.textContent='Copié !'; setTimeout(()=>el.textContent=API_KEY.slice(0,4)+'••••'+API_KEY.slice(-4),1500);
 };
+document.getElementById('clear-btn').onclick=()=>{
+  dbDel('inputFile').catch(()=>{});
+  inputBlob=null; thumbCache={}; previewPage=1; previewZoom=null;
+  setOutputBlob(null);
+  const sidebar=document.getElementById('history-sidebar');
+  sidebar.classList.remove('visible');
+  document.querySelector('.layout').classList.remove('has-sidebar');
+  const fn=document.getElementById('sdz-filename');
+  if(fn){fn.textContent='';fn.style.display='none';}
+  document.getElementById('sidebar-thumbs').innerHTML='';
+  showPlaceholder('',true);
+  activate('__home');
+  toast('Réinitialisé','Tous les fichiers effacés','ok',2000);
+};
 document.getElementById('logout-btn').onclick=()=>{
   localStorage.removeItem('quill_api_key');API_KEY='';
+  dbDel('inputFile').catch(()=>{});
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('login-key').value='';
 };
 
 // ── Boot ──────────────────────────────────────────────────────────────────
-activate(PANELS[0].items[0].id);
-showPlaceholder('Sélectionnez un fichier\npour voir l\'aperçu');
+activate('__home');
 boot();
 </script>
 </body>

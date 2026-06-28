@@ -1,0 +1,71 @@
+"""Text editing: cover original text with white, insert replacement at same position."""
+
+from pathlib import Path
+
+
+def replace_text(
+    input: Path,
+    output: Path,
+    page: int,
+    x0: float,
+    y0: float,
+    x1: float,
+    y1: float,
+    new_text: str,
+) -> None:
+    """
+    Replace text inside a bounding box on a PDF page.
+
+    Strategy: draw a white rectangle over the original text, then write
+    the new text at the same position. Font is auto-detected from the
+    content inside the rect; falls back to 12pt Helvetica if not found.
+    """
+    import fitz
+
+    if page < 1:
+        raise ValueError(f"page must be >= 1, got {page}")
+
+    doc = fitz.open(str(input))
+    try:
+        if page > len(doc):
+            raise ValueError(f"page {page} exceeds document length ({len(doc)})")
+
+        pg = doc[page - 1]
+        rect = fitz.Rect(x0, y0, x1, y1)
+
+        # Detect font size from text spans that overlap the target rect
+        font_size = 12.0
+        color = (0.0, 0.0, 0.0)
+        for block in pg.get_text("dict")["blocks"]:
+            if block.get("type") != 0:  # 0 = text block
+                continue
+            for line in block["lines"]:
+                for span in line["spans"]:
+                    if fitz.Rect(span["bbox"]).intersects(rect):
+                        font_size = span["size"]
+                        # Normalise color from 0-255 int to 0-1 float if needed
+                        c = span.get("color", 0)
+                        if isinstance(c, int):
+                            r = ((c >> 16) & 0xFF) / 255
+                            g = ((c >> 8) & 0xFF) / 255
+                            b = (c & 0xFF) / 255
+                            color = (r, g, b)
+                        break
+
+        # Cover the original text with a white rectangle
+        shape = pg.new_shape()
+        shape.draw_rect(rect)
+        shape.finish(color=(1, 1, 1), fill=(1, 1, 1), width=0)
+        shape.commit()
+
+        # Insert new text at the baseline of the rect (y1 = bottom of rect in PDF coords)
+        pg.insert_text(
+            fitz.Point(x0, y1),
+            new_text,
+            fontsize=font_size,
+            color=color,
+        )
+
+        doc.save(str(output), garbage=4, deflate=True)
+    finally:
+        doc.close()
