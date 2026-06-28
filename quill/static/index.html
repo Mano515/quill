@@ -1255,7 +1255,8 @@ function showInlineEditor(wrap, span, vp, pageNum) {
       showChainPill();
       addToHistory({ label:'Édition texte', inputName:src?.name||'fichier.pdf', outputName:'edited.pdf', blob:result, url, ts:Date.now() });
       toast('Texte modifié', 'Résultat prêt', 'ok', 4000);
-      switchTab('output');
+      // Re-rendre l'aperçu avec le PDF modifié pour voir le changement immédiatement
+      await renderPDF(result);
     } catch (err) {
       // Revert to editable state on error
       done = false;
