@@ -1009,8 +1009,11 @@ async function renderPage(num) {
       const cx = mat[4];         // x CSS du début de ligne (origine texte)
       const cy = mat[5];         // y CSS de la baseline
       // Math.hypot(mat[2], mat[3]) = norme de la 2e colonne = hauteur réelle pour tout angle de rotation
-      const fontH = Math.hypot(mat[2], mat[3]);
-      if (fontH < 2) continue;
+      const fontH  = Math.hypot(mat[2], mat[3]);
+      // Filtrer en points PDF (= fontH / scale) plutôt qu'en pixels CSS,
+      // sinon les PDFs Figma (page >1000pt) filtrent tout à cause du zoom faible.
+      const fontPt = fontH / vp.scale;
+      if (fontPt < 3) continue;
       const wPx = Math.max((item.width || 0) * vp.scale, 4);
       const span = document.createElement('span');
       span.textContent = item.str;
