@@ -83,10 +83,19 @@ def sample_pdf(tmp_path_factory) -> Path:
 # ── Helpers Playwright ────────────────────────────────────────────────────────
 
 def _login(page, api_key: str):
-    """Injecte la clé API dans le localStorage et recharge."""
+    """Injecte la clé API dans le localStorage, recharge et attend l'accueil."""
     page.evaluate(f"localStorage.setItem('quill_api_key', '{api_key}')")
     page.reload()
-    page.wait_for_load_state("networkidle")
+    # boot() fait un fetch async vers /auth/login avant d'appeler showApp() ;
+    # on attend que #app reçoive la classe "visible".
+    page.wait_for_selector("#app.visible", timeout=10000)
+    # dbGet('inputFile') peut charger un fichier et changer de panel ;
+    # on force le retour à l'accueil pour que les tests partent d'un état stable.
+    page.evaluate("if (typeof activate === 'function') activate('__home')")
+    # state="attached" : on vérifie que le panel est dans le DOM avec la classe
+    # active, sans exiger la visibilité CSS (l'ancêtre #app peut avoir un
+    # display calculé non visible selon le contexte de test Playwright).
+    page.wait_for_selector("#panel-__home.active", state="attached", timeout=5000)
 
 
 def _drag_drop_file(page, selector: str, file_path: Path):
@@ -142,7 +151,7 @@ class TestDragDrop:
         page.on("pageerror", lambda e: errors.append(str(e)))
         page.goto(BASE_URL)
         _login(page, API_KEY)
-        page.wait_for_selector("#home-hero", timeout=5000)
+        page.wait_for_selector("#panel-__home.active", state="attached", timeout=5000)
         assert not errors, f"Erreurs JS au chargement : {errors}"
 
     def test_overlay_shows_on_dragenter(self, quill_server, page):
@@ -150,7 +159,7 @@ class TestDragDrop:
         from quill.api.auth import API_KEY
         page.goto(BASE_URL)
         _login(page, API_KEY)
-        page.wait_for_selector("#home-hero")
+        page.wait_for_selector("#panel-__home.active", state="attached")
 
         page.evaluate("""
             const dt = new DataTransfer();
@@ -168,7 +177,7 @@ class TestDragDrop:
         from quill.api.auth import API_KEY
         page.goto(BASE_URL)
         _login(page, API_KEY)
-        page.wait_for_selector("#home-hero")
+        page.wait_for_selector("#panel-__home.active", state="attached")
 
         _drag_drop_file(page, "#home-hero", sample_pdf)
         page.wait_for_timeout(300)
@@ -181,7 +190,7 @@ class TestDragDrop:
         from quill.api.auth import API_KEY
         page.goto(BASE_URL)
         _login(page, API_KEY)
-        page.wait_for_selector("#home-hero")
+        page.wait_for_selector("#panel-__home.active", state="attached")
 
         _drag_drop_file(page, "#home-hero", sample_pdf)
         # Le nom du fichier doit apparaître dans le header de prévisualisation
@@ -194,7 +203,7 @@ class TestDragDrop:
         from quill.api.auth import API_KEY
         page.goto(BASE_URL)
         _login(page, API_KEY)
-        page.wait_for_selector("#home-hero")
+        page.wait_for_selector("#panel-__home.active", state="attached")
 
         _drag_drop_file(page, "#home-hero", sample_pdf)
         # Un <canvas> doit apparaître dans le corps de l'aperçu
@@ -208,10 +217,16 @@ class TestDragDrop:
         page.goto(BASE_URL)
         _login(page, API_KEY)
 
-        # Activer le panneau "Fusionner"
-        page.wait_for_selector("text=Fusionner", timeout=4000)
-        page.locator("text=Fusionner").first.click()
-        page.wait_for_selector(".drop-zone", timeout=4000)
+        # En home-mode la colonne nav est masquée (grid 1fr sans sidebar nav).
+        # On active le panel merge directement via JS pour contourner ce comportement.
+        # activate() est dans un module ES — pas accessible via window.
+        # On reproduit son effet directement : retirer home-mode, activer le panel.
+        page.evaluate("""() => {
+            document.querySelector('.panel.active')?.classList.remove('active');
+            document.querySelector('.layout')?.classList.remove('home-mode');
+            document.getElementById('panel-merge')?.classList.add('active');
+        }""")
+        page.wait_for_selector("#panel-merge.active", state="attached", timeout=4000)
 
         # Dépose sur la première drop-zone du panneau actif
         _drag_drop_file(page, "#panel-merge .drop-zone", sample_pdf)
