@@ -116,17 +116,30 @@ def replace_text(
         shape.commit()
 
         # ── 4. Insert replacement text ─────────────────────────────────────
-        # Use insert_textbox so alignment is handled correctly.
-        # The box height is generous (3× font size) to avoid clipping.
-        insert_rect = fitz.Rect(box_x0, text_y1 - font_size * 1.2, box_x1, text_y1 + descender)
+        # insert_text(Point, text) place le texte à partir de la baseline —
+        # beaucoup plus fiable qu'insert_textbox qui échoue silencieusement
+        # si le rect est trop petit (retourne < 0 sans rien insérer).
+        # On calcule la largeur du texte de remplacement pour positionner
+        # correctement selon l'alignement détecté.
+        try:
+            text_width = fitz.Font(fontname=fontname).text_length(new_text, fontsize=font_size)
+        except Exception:
+            text_width = text_x1 - text_x0   # fallback : largeur du span original
 
-        pg.insert_textbox(
-            insert_rect,
+        if align == fitz.TEXT_ALIGN_RIGHT:
+            insert_x = text_x1 - text_width
+        elif align == fitz.TEXT_ALIGN_CENTER:
+            center = (text_x0 + text_x1) / 2
+            insert_x = center - text_width / 2
+        else:  # gauche
+            insert_x = text_x0
+
+        pg.insert_text(
+            fitz.Point(insert_x, text_y1),
             new_text,
             fontsize=font_size,
             fontname=fontname,
             color=color,
-            align=align,
         )
 
         doc.save(str(output), garbage=4, deflate=True)
