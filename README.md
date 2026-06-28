@@ -7,8 +7,6 @@ Fusionne, divise, annote, signe, chiffre, extrait, convertit — le tout en loca
 
 ## Aperçu
 
-![Interface Quill](https://raw.githubusercontent.com/Mano515/quill/main/docs/screenshot.png)
-
 - **Interface web** — glisser-déposer, aperçu en temps réel, édition de texte au clic
 - **API REST** — FastAPI, clé API, entièrement documentée sur `/docs`
 - **CLI** — toutes les fonctionnalités disponibles en ligne de commande
@@ -81,7 +79,7 @@ cat .quill_api_key
 | Insérer image | Logo ou cachet positionné au clic |
 | Commentaire | Note collante (sticky note) |
 | Numéroter pages | Position, préfixe et numéro de départ configurables |
-| **Éditer texte** | Cliquer sur du texte dans l'aperçu pour le réécrire directement |
+| **Éditer texte** | Cliquer directement sur du texte dans l'aperçu pour le réécrire |
 
 ### 📊 Extraction
 | Outil | Description |
@@ -94,7 +92,7 @@ cat .quill_api_key
 ### 📋 Formulaires
 | Outil | Description |
 |---|---|
-| Lister champs | Voir tous les champs interactifs |
+| Lister champs | Voir tous les champs interactifs et leurs valeurs |
 | Remplir | Remplir les champs avec des données JSON |
 | Aplatir | Rendre les champs non modifiables |
 | Créer | Générer un PDF interactif depuis zéro |
@@ -129,19 +127,24 @@ cat .quill_api_key
 |---|---|
 | `Ctrl + Entrée` | Lancer l'opération active |
 | `← / →` | Page précédente / suivante dans l'aperçu |
-| `I` | Voir le fichier source |
-| `O` | Voir le résultat |
-| `H` | Ouvrir l'historique |
-| `?` | Afficher l'aide |
+| `E` | Activer / désactiver le mode édition texte |
+| `?` | Afficher l'aide clavier |
 | `Échap` | Fermer les fenêtres |
 
 ### Édition de texte
 
-1. Chargez un PDF dans n'importe quel outil
-2. Cliquez sur **✏ Éditer** dans le header de l'aperçu
-3. Survolez le texte — les mots se surlignent
-4. Cliquez sur un mot ou une phrase pour l'éditer
-5. `Entrée` pour valider, `Échap` pour annuler
+L'aperçu est **toujours en mode édition**. Il suffit de :
+
+1. Charger un PDF (glisser-déposer ou sélecteur de fichier)
+2. Survoler le texte — les mots se surlignent en violet
+3. Cliquer sur un mot ou une phrase pour l'éditer
+4. `Entrée` pour valider, `Échap` pour annuler
+
+Le texte original est effacé et remplacé à la même position, avec la même taille de police détectée automatiquement.
+
+### Persistance du fichier
+
+Le PDF chargé est conservé dans **IndexedDB** et se retrouve automatiquement après un rechargement de page. Le bouton **🗑 Tout effacer** dans la sidebar supprime le fichier sauvegardé.
 
 ### Chaînage d'opérations
 
@@ -197,6 +200,18 @@ curl -X POST http://localhost:8080/basic/merge \
   --output merged.pdf
 ```
 
+**Édition de texte :**
+
+```bash
+curl -X POST http://localhost:8080/edit/replace-text \
+  -H "X-API-Key: VOTRE_CLE" \
+  -F "file=@doc.pdf" \
+  -F "page=1" \
+  -F "x0=50" -F "y0=100" -F "x1=200" -F "y1=115" \
+  -F "new_text=Nouveau contenu" \
+  --output edited.pdf
+```
+
 ---
 
 ## Structure du projet
@@ -204,14 +219,23 @@ curl -X POST http://localhost:8080/basic/merge \
 ```
 quill/
 ├── api/
-│   ├── app.py          # Application FastAPI
-│   ├── auth.py         # Authentification par clé API
-│   ├── deps.py         # Helpers partagés (workdir, réponses)
+│   ├── app.py          # Application FastAPI — enregistre tous les routeurs
+│   ├── auth.py         # Authentification par clé API (header X-API-Key)
+│   ├── deps.py         # Helpers partagés : workdir(), pdf_response(), parse_pages()
 │   └── routes/         # Un fichier par groupe de fonctionnalités
-├── features/           # Logique métier (indépendante de l'API)
+│       ├── basic.py
+│       ├── annotations.py
+│       ├── edit.py     # POST /edit/replace-text
+│       ├── extraction.py
+│       ├── forms.py
+│       ├── ocr.py
+│       ├── security.py
+│       ├── sign.py
+│       └── convert.py
+├── features/           # Logique métier pure (sans dépendance FastAPI)
 │   ├── basic.py
 │   ├── annotations.py
-│   ├── edit.py
+│   ├── edit.py         # Remplacement de texte via PyMuPDF
 │   ├── extraction.py
 │   ├── forms.py
 │   ├── ocr.py
@@ -219,11 +243,14 @@ quill/
 │   ├── sign.py
 │   └── convert.py
 ├── static/
-│   └── index.html      # Interface web (SPA)
-├── cli.py              # Interface ligne de commande
-└── server.py           # Point d'entrée quill-server
+│   └── index.html      # SPA complète (HTML + CSS + JS, zéro dépendance bundlée)
+├── cli.py              # Interface ligne de commande (Click)
+└── server.py           # Point d'entrée : quill-server → uvicorn sur :8080
 tests/
-├── test_api.py         # Tests end-to-end (68 tests)
+├── conftest.py         # Fixtures partagées (client HTTP, PDF de test)
+├── test_api.py         # Tests API end-to-end (~80 tests)
+├── test_edit.py        # Tests du remplacement de texte
+├── test_e2e_drag_drop.py  # Tests Playwright (drag & drop, rendu PDF)
 └── test_sign.py        # Tests unitaires signatures
 ```
 
@@ -233,7 +260,18 @@ tests/
 
 ```bash
 pip install -e ".[dev]"
-pytest
+pytest                  # tous les tests
+pytest tests/test_api.py           # API uniquement
+pytest tests/test_edit.py          # édition texte
+pytest -m "not e2e"                # sans les tests Playwright
+```
+
+Les tests E2E nécessitent Playwright :
+
+```bash
+pip install pytest-playwright
+python -m playwright install chromium
+pytest -m e2e
 ```
 
 ---

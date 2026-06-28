@@ -336,7 +336,7 @@
     <!-- Nav -->
     <nav id="nav">
       <div class="nav-search-wrap">
-        <input class="nav-search" id="nav-search" type="text" placeholder="Rechercher un outil…" autocomplete="off" />
+        <input class="nav-search" id="drawer-search" type="text" placeholder="Rechercher un outil…" autocomplete="off" />
       </div>
       <div class="nav-scroll" id="nav-scroll">
         <!-- injected by JS -->
@@ -478,14 +478,24 @@ import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.worker.min.mjs';
 
 // ── State ─────────────────────────────────────────────────────────────────
+// Toutes les variables globales de l'application sont regroupées ici.
 let API_KEY = localStorage.getItem('quill_api_key') || '';
+
+// PDF en cours d'affichage dans l'aperçu (objet PDF.js, page courante, zoom)
 let previewDoc = null, previewPage = 1, previewZoom = null;
+
+// Fichiers chargés : inputBlob = PDF source, outputBlob = dernier résultat produit
+// lastOutputBlob est conservé pour le chaînage d'opérations après fermeture du toast
 let inputBlob = null, outputBlob = null, lastOutputBlob = null;
+
+// Mode "clic pour coordonnées" : xyMode active la réticule sur l'aperçu
+// xyTargetX/Y pointent vers les <input> à remplir quand l'utilisateur clique
 let xyMode = false, xyTargetX = null, xyTargetY = null, xyScale = 1;
-let editMode = true;
-let thumbCache = {};
-let sessionHistory = [];
-let activePanelId = null;
+
+let editMode = true;   // toujours actif — clic sur le texte ouvre l'éditeur inline
+let thumbCache = {};   // cache des miniatures par numéro de page {url, w, h}
+let sessionHistory = [];  // [{id, label, group, inputName, outputName, blob, url, ts}]
+let activePanelId = null; // id du panneau d'opération actuellement affiché
 
 // ── PANELS ────────────────────────────────────────────────────────────────
 const PANELS = [
@@ -663,6 +673,27 @@ PANELS.forEach(group => {
 })();
 
 
+// ── Drawer search — filtre les boutons nav visibles dans le drawer ────────
+(function(){
+  const inp = document.getElementById('drawer-search');
+  if (!inp) return;
+  inp.oninput = () => {
+    const q = inp.value.toLowerCase().trim();
+    // Montre/cache chaque bouton nav-item selon la query
+    navScroll.querySelectorAll('button.nav-item').forEach(btn => {
+      const match = !q || (btn.dataset.label || '').includes(q);
+      btn.closest('div') && (btn.style.display = match ? '' : 'none');
+    });
+    // Montre/cache les titres de groupe si tous leurs enfants sont cachés
+    navScroll.querySelectorAll('.nav-group').forEach(g => {
+      const visible = [...g.querySelectorAll('button.nav-item')].some(b => b.style.display !== 'none');
+      g.style.display = visible ? '' : 'none';
+    });
+    document.getElementById('nav-no-results').style.display =
+      [...navScroll.querySelectorAll('button.nav-item')].every(b => b.style.display === 'none') ? 'block' : 'none';
+  };
+})();
+
 // ── Home panel quick actions ───────────────────────────────────────────────
 function buildHomeGrids() {
   const allItems = PANELS.flatMap(g => g.items.map(i => ({...i, group: g.group})));
@@ -705,6 +736,8 @@ homeHero.ondrop = e => {
   if (pdf) loadFile(pdf);
 };
 
+// Charge un fichier PDF comme source : ouvre la sidebar, lance le rendu des
+// miniatures, persiste le fichier dans IndexedDB pour survivre aux rechargements.
 function loadFile(file) {
   inputBlob = file; outputBlob = null; thumbCache = {};
   const sidebar = document.getElementById('history-sidebar');
@@ -904,12 +937,15 @@ async function renderPDF(blob) {
   }
 }
 
+// Affiche la page `num` du PDF courant dans le panneau aperçu.
+// Deux passes : d'abord le rendu canvas (pixels), puis le text layer (spans cliquables).
 async function renderPage(num) {
   const body=document.getElementById('preview-body');
   body.innerHTML='';
   const page=await previewDoc.getPage(num);
   const vp0=page.getViewport({scale:1});
-  // Fit-to-page par défaut : on prend le plus petit ratio (largeur ou hauteur)
+  // Premier rendu : calcule le zoom pour que la page tienne dans le panneau.
+  // Les suivants (zoom-in/out) réutilisent previewZoom tel quel.
   if(previewZoom===null){
     const sw=(body.clientWidth-28)/vp0.width;
     const sh=(body.clientHeight-28)/vp0.height;
@@ -931,7 +967,7 @@ async function renderPage(num) {
     const textContent = await page.getTextContent();
     const tl = document.createElement('div');
     tl.className = 'text-layer edit-active';
-    tl.style.cssText = `position:absolute;top:0;left:0;width:${vp.width}px;height:${vp.height}px;overflow:hidden;`;
+    tl.style.cssText = `position:absolute;top:0;left:0;width:${vp.width}px;height:${vp.height}px;overflow:visible;`;
     wrap.appendChild(tl);
     for (const item of textContent.items) {
       if (!item.str || !item.str.trim()) continue;
@@ -939,7 +975,8 @@ async function renderPage(num) {
       const mat = pdfjsLib.Util.transform(vp.transform, item.transform);
       const cx = mat[4];         // x CSS du début de ligne (origine texte)
       const cy = mat[5];         // y CSS de la baseline
-      const fontH = Math.abs(mat[3]);  // hauteur police en px CSS
+      // Math.hypot(mat[2], mat[3]) = norme de la 2e colonne = hauteur réelle pour tout angle de rotation
+      const fontH = Math.hypot(mat[2], mat[3]);
       if (fontH < 2) continue;
       const wPx = Math.max((item.width || 0) * vp.scale, 4);
       const span = document.createElement('span');
