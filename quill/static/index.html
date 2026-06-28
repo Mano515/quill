@@ -813,18 +813,44 @@ function buildField(f, item) {
   const wrap = document.createElement('label');
   const strong = document.createElement('strong'); strong.textContent = f.label;
   wrap.appendChild(strong);
-  if (f.type==='file')          wrap.appendChild(buildDropZone(f, item));
-  else if (f.type==='pages-picker') wrap.appendChild(buildPagesPicker(f, item));
-  else if (f.type==='select')   { const s=document.createElement('select'); s.name=f.name; (f.options||[]).forEach(o=>s.appendChild(new Option(o,o))); wrap.appendChild(s); }
-  else if (f.type==='textarea') { const t=document.createElement('textarea'); t.name=f.name; t.placeholder=f.placeholder||''; wrap.appendChild(t); }
-  else { const i=document.createElement('input'); i.type='text'; i.name=f.name; i.placeholder=f.placeholder||''; if(f.type==='xy'){i.dataset.axis=f.axis;i.id=`xy-${item.id}-${f.axis}`;} wrap.appendChild(i); }
+  if (f.type === 'file') {
+    wrap.appendChild(buildDropZone(f, item));
+  } else if (f.type === 'pages-picker') {
+    wrap.appendChild(buildPagesPicker(f, item));
+  } else if (f.type === 'select') {
+    const s = document.createElement('select');
+    s.name = f.name;
+    (f.options || []).forEach(o => s.appendChild(new Option(o, o)));
+    wrap.appendChild(s);
+  } else if (f.type === 'textarea') {
+    const t = document.createElement('textarea');
+    t.name = f.name;
+    t.placeholder = f.placeholder || '';
+    wrap.appendChild(t);
+  } else {
+    // Champ texte simple, ou champ xy (coordonnées cliquées sur l'aperçu)
+    const i = document.createElement('input');
+    i.type = 'text';
+    i.name = f.name;
+    i.placeholder = f.placeholder || '';
+    if (f.type === 'xy') {
+      i.dataset.axis = f.axis;
+      i.id = `xy-${item.id}-${f.axis}`;
+    }
+    wrap.appendChild(i);
+  }
   return wrap;
 }
 
 // ── Drop zone ─────────────────────────────────────────────────────────────
 function buildDropZone(f, item) {
-  const dz = document.createElement('div'); dz.className = 'drop-zone';
-  const inp = document.createElement('input'); inp.type='file'; inp.name=f.name; inp.accept=f.accept||''; if(f.multiple) inp.multiple=true;
+  const dz = document.createElement('div');
+  dz.className = 'drop-zone';
+  const inp = document.createElement('input');
+  inp.type   = 'file';
+  inp.name   = f.name;
+  inp.accept = f.accept || '';
+  if (f.multiple) inp.multiple = true;
   dz.innerHTML = `<div class="dz-text"><strong>Cliquer</strong> ou glisser-déposer</div>
     <div class="dz-hint">${f.accept||'tous fichiers'}${f.multiple?' — plusieurs fichiers acceptés':''}</div>
     <div class="dz-files" id="dzf-${item.id}-${f.name}"></div>`;
@@ -843,7 +869,14 @@ function buildDropZone(f, item) {
   inp.onchange = () => onFiles(inp.files);
   dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag-over'); };
   dz.ondragleave = () => dz.classList.remove('drag-over');
-  dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag-over'); const dt=new DataTransfer(); Array.from(e.dataTransfer.files).forEach(f=>dt.items.add(f)); inp.files=dt.files; onFiles(inp.files); };
+  dz.ondrop = e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    const dt = new DataTransfer();
+    Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+    inp.files = dt.files;
+    onFiles(inp.files);
+  };
   return dz;
 }
 
@@ -1013,9 +1046,30 @@ function updatePageControls() {
   document.getElementById('page-info').textContent=t?`${previewPage}/${t}`:'—';
 }
 
-function updateSidebarActive(p){document.getElementById('sidebar-thumbs')?.querySelectorAll('.stb').forEach(t=>t.classList.toggle('active',+t.dataset.page===p));}
-document.getElementById('prev-page').onclick=async()=>{if(previewPage>1){previewPage--;updatePageControls();await renderPage(previewPage);updateSidebarActive(previewPage);}};
-document.getElementById('next-page').onclick=async()=>{if(previewDoc&&previewPage<previewDoc.numPages){previewPage++;updatePageControls();await renderPage(previewPage);updateSidebarActive(previewPage);}};
+// Met en évidence la miniature correspondant à la page affichée
+function updateSidebarActive(p) {
+  document.getElementById('sidebar-thumbs')
+    ?.querySelectorAll('.stb')
+    .forEach(t => t.classList.toggle('active', +t.dataset.page === p));
+}
+
+document.getElementById('prev-page').onclick = async () => {
+  if (previewPage > 1) {
+    previewPage--;
+    updatePageControls();
+    await renderPage(previewPage);
+    updateSidebarActive(previewPage);
+  }
+};
+
+document.getElementById('next-page').onclick = async () => {
+  if (previewDoc && previewPage < previewDoc.numPages) {
+    previewPage++;
+    updatePageControls();
+    await renderPage(previewPage);
+    updateSidebarActive(previewPage);
+  }
+};
 document.getElementById('zoom-in').onclick=()=>{if(!previewDoc)return;previewZoom=(previewZoom||1)*1.25;renderPage(previewPage);};
 document.getElementById('zoom-out').onclick=()=>{if(!previewDoc)return;previewZoom=(previewZoom||1)*0.8;renderPage(previewPage);};
 document.getElementById('zoom-fit').onclick=()=>{if(!previewDoc)return;previewZoom=null;renderPage(previewPage);};
@@ -1242,10 +1296,21 @@ function showInlineEditor(wrap, span, vp, pageNum) {
 async function callReplaceText(blob, page, x0, y0, x1, y1, newText) {
   const fd = new FormData();
   fd.append('file', blob, blob.name||'input.pdf');
-  fd.append('page', page); fd.append('x0', x0); fd.append('y0', y0); fd.append('x1', x1); fd.append('y1', y1);
+  fd.append('page',     page);
+  fd.append('x0',      x0);
+  fd.append('y0',      y0);
+  fd.append('x1',      x1);
+  fd.append('y1',      y1);
   fd.append('new_text', newText);
-  const resp = await fetch('/edit/replace-text', { method:'POST', headers:{'X-API-Key':API_KEY}, body:fd });
-  if (!resp.ok) { const e=await resp.json().catch(()=>({detail:resp.statusText})); throw new Error(e.detail); }
+  const resp = await fetch('/edit/replace-text', {
+    method: 'POST',
+    headers: { 'X-API-Key': API_KEY },
+    body: fd,
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+    throw new Error(err.detail);
+  }
   return resp.blob();
 }
 
@@ -1482,68 +1547,151 @@ document.getElementById('shortcuts-close').onclick=()=>document.getElementById('
 document.getElementById('shortcuts-modal').onclick=e=>{if(e.target===document.getElementById('shortcuts-modal'))document.getElementById('shortcuts-modal').classList.remove('visible');};
 
 // ── IndexedDB persistence ─────────────────────────────────────────────────
+// Sauvegarde le PDF chargé entre les rechargements de page.
+// dbSet / dbGet / dbDel sont exposés globalement (window.*) pour être appelés depuis n'importe où.
 (()=>{
-  const DB='quill_db', STORE='files', VER=1;
-  function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,VER);r.onupgradeneeded=e=>e.target.result.createObjectStore(STORE);r.onsuccess=e=>res(e.target.result);r.onerror=rej;});}
-  window.dbSet=async(k,v)=>{const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(v,k);tx.oncomplete=res;tx.onerror=rej;});};
-  window.dbGet=async(k)=>{const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readonly');const r=tx.objectStore(STORE).get(k);r.onsuccess=e=>res(e.target.result);r.onerror=rej;});};
-  window.dbDel=async(k)=>{const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(k);tx.oncomplete=res;tx.onerror=rej;});};
+  const DB_NAME = 'quill_db';
+  const STORE   = 'files';
+  const DB_VER  = 1;
+
+  // Ouvre (ou crée) la base et retourne une Promise<IDBDatabase>.
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(STORE);
+      req.onsuccess       = e => resolve(e.target.result);
+      req.onerror         = reject;
+    });
+  }
+
+  window.dbSet = async (key, value) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(value, key);
+      tx.oncomplete = resolve;
+      tx.onerror    = reject;
+    });
+  };
+
+  window.dbGet = async (key) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx  = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror   = reject;
+    });
+  };
+
+  window.dbDel = async (key) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(key);
+      tx.oncomplete = resolve;
+      tx.onerror    = reject;
+    });
+  };
 })();
 
 // ── Auth ──────────────────────────────────────────────────────────────────
-async function tryLogin(key){const r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key})});return r.ok;}
-async function boot(){
-  if(API_KEY&&await tryLogin(API_KEY).catch(()=>false)){showApp();return;}
-  localStorage.removeItem('quill_api_key');API_KEY='';
-}
-document.getElementById('login-btn').onclick=async()=>{
-  const key=document.getElementById('login-key').value.trim();if(!key)return;
-  if(await tryLogin(key).catch(()=>false)){API_KEY=key;localStorage.setItem('quill_api_key',key);document.getElementById('login-err').style.display='none';showApp();}
-  else document.getElementById('login-err').style.display='block';
-};
-document.getElementById('login-key').onkeydown=e=>{if(e.key==='Enter')document.getElementById('login-btn').click();};
-function setSidebarHeight(){
-  const hdr=document.querySelector('header');
-  const sb=document.getElementById('history-sidebar');
-  if(sb.classList.contains('visible'))
-    sb.style.height=(window.innerHeight-hdr.getBoundingClientRect().height)+'px';
-}
-window.addEventListener('resize',setSidebarHeight);
 
-function showApp(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').classList.add('visible');
-  const m=API_KEY.slice(0,4)+'••••'+API_KEY.slice(-4);
-  document.getElementById('key-display').textContent=m;
-  dbGet('inputFile').then(file=>{
-    if(file) loadFile(file);
-  }).catch(()=>{});
+// Vérifie la clé API auprès du serveur. Retourne true si acceptée.
+async function tryLogin(key) {
+  const resp = await fetch('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key }),
+  });
+  return resp.ok;
 }
-document.getElementById('key-display').onclick=()=>{
+
+// Appelé au chargement : reconnecte automatiquement si une clé est sauvegardée.
+async function boot() {
+  if (API_KEY && await tryLogin(API_KEY).catch(() => false)) {
+    showApp();
+    return;
+  }
+  // Clé invalide ou expirée : on efface et on reste sur l'écran de login.
+  localStorage.removeItem('quill_api_key');
+  API_KEY = '';
+}
+
+document.getElementById('login-btn').onclick = async () => {
+  const key = document.getElementById('login-key').value.trim();
+  if (!key) return;
+  if (await tryLogin(key).catch(() => false)) {
+    API_KEY = key;
+    localStorage.setItem('quill_api_key', key);
+    document.getElementById('login-err').style.display = 'none';
+    showApp();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+};
+
+// Soumettre le formulaire de login avec Entrée
+document.getElementById('login-key').onkeydown = e => {
+  if (e.key === 'Enter') document.getElementById('login-btn').click();
+};
+
+// Calcule et applique la hauteur exacte de la sidebar pour qu'elle remplisse
+// l'espace sous le header sans déborder (nécessaire pour le scroll des miniatures).
+function setSidebarHeight() {
+  const headerH = document.querySelector('header').getBoundingClientRect().height;
+  const sidebar  = document.getElementById('history-sidebar');
+  if (sidebar.classList.contains('visible'))
+    sidebar.style.height = (window.innerHeight - headerH) + 'px';
+}
+window.addEventListener('resize', setSidebarHeight);
+
+// Affiche l'application après connexion réussie.
+// Restaure le fichier PDF éventuellement sauvegardé en IndexedDB.
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  // Affiche une version masquée de la clé (ex : "ab12••••ef56")
+  const masked = API_KEY.slice(0, 4) + '••••' + API_KEY.slice(-4);
+  document.getElementById('key-display').textContent = masked;
+  dbGet('inputFile').then(file => { if (file) loadFile(file); }).catch(() => {});
+}
+
+// Clic sur le badge de clé → copie dans le presse-papier
+document.getElementById('key-display').onclick = () => {
   navigator.clipboard.writeText(API_KEY);
-  const el=document.getElementById('key-display');
-  el.textContent='Copié !'; setTimeout(()=>el.textContent=API_KEY.slice(0,4)+'••••'+API_KEY.slice(-4),1500);
+  const el = document.getElementById('key-display');
+  const masked = API_KEY.slice(0, 4) + '••••' + API_KEY.slice(-4);
+  el.textContent = 'Copié !';
+  setTimeout(() => { el.textContent = masked; }, 1500);
 };
-document.getElementById('clear-btn').onclick=()=>{
-  dbDel('inputFile').catch(()=>{});
-  inputBlob=null; thumbCache={}; previewPage=1; previewZoom=null;
+
+// Tout effacer : supprime le fichier IndexedDB, réinitialise l'état, retourne à l'accueil
+document.getElementById('clear-btn').onclick = () => {
+  dbDel('inputFile').catch(() => {});
+  inputBlob = null;
+  thumbCache = {};
+  previewPage = 1;
+  previewZoom = null;
   setOutputBlob(null);
-  const sidebar=document.getElementById('history-sidebar');
-  sidebar.classList.remove('visible');
+  document.getElementById('history-sidebar').classList.remove('visible');
   document.querySelector('.layout').classList.remove('has-sidebar');
-  const fn=document.getElementById('sdz-filename');
-  if(fn){fn.textContent='';fn.style.display='none';}
-  document.getElementById('sidebar-thumbs').innerHTML='';
-  showPlaceholder('',true);
+  const fn = document.getElementById('sdz-filename');
+  if (fn) { fn.textContent = ''; fn.style.display = 'none'; }
+  document.getElementById('sidebar-thumbs').innerHTML = '';
+  showPlaceholder('', true);
   activate('__home');
-  toast('Réinitialisé','Tous les fichiers effacés','ok',2000);
+  toast('Réinitialisé', 'Tous les fichiers effacés', 'ok', 2000);
 };
-document.getElementById('logout-btn').onclick=()=>{
-  localStorage.removeItem('quill_api_key');API_KEY='';
-  dbDel('inputFile').catch(()=>{});
+
+// Déconnexion : efface la clé et le fichier sauvegardé, retourne au login
+document.getElementById('logout-btn').onclick = () => {
+  localStorage.removeItem('quill_api_key');
+  API_KEY = '';
+  dbDel('inputFile').catch(() => {});
   document.getElementById('app').classList.remove('visible');
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('login-key').value='';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-key').value = '';
 };
 
 // ── Boot ──────────────────────────────────────────────────────────────────
