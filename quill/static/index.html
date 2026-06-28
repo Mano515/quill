@@ -1248,7 +1248,9 @@ function showInlineEditor(wrap, span, vp, pageNum) {
     try {
       const src = outputBlob || inputBlob;
       if (!src) throw new Error('Aucun fichier chargé');
+      console.log('[edit] commit', { pageNum, bx0, by0, bx1, by1, newText, src: src?.name, size: src?.size });
       const result = await callReplaceText(src, pageNum, bx0, by0, bx1, by1, newText);
+      console.log('[edit] result ok, size=', result?.size);
       close();
       // Mettre à jour inputBlob pour que les éditions suivantes s'accumulent
       inputBlob = new File([result], src?.name || 'edited.pdf', { type: 'application/pdf' });
@@ -1261,14 +1263,17 @@ function showInlineEditor(wrap, span, vp, pageNum) {
       // Recharger le PDF et rester sur la même page avec le même zoom
       const savedPage = previewPage;
       const savedZoom = previewZoom;
+      console.log('[edit] re-rendering page', savedPage, 'zoom', savedZoom);
       const doc = await pdfjsLib.getDocument({ data: await inputBlob.arrayBuffer() }).promise;
       previewDoc = doc;
       previewPage = Math.min(savedPage, doc.numPages);
       previewZoom = savedZoom;
       updatePageControls();
       await renderPage(previewPage);
+      console.log('[edit] renderPage done');
       updateSidebarActive(previewPage);
     } catch (err) {
+      console.error('[edit] error in commit:', err);
       // Revert to editable state on error
       done = false;
       editor.contentEditable = 'true';
@@ -1391,6 +1396,7 @@ function addToHistory(entry) {
 }
 function renderHistory() {
   const el=document.getElementById('history-content');
+  if(!el) return;
   if(!sessionHistory.length){el.innerHTML='<div class="history-empty">Aucune opération pour l\'instant.</div>';return;}
   const list=document.createElement('div'); list.className='history-list';
   sessionHistory.forEach((h,i)=>{
