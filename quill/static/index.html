@@ -1250,13 +1250,24 @@ function showInlineEditor(wrap, span, vp, pageNum) {
       if (!src) throw new Error('Aucun fichier chargé');
       const result = await callReplaceText(src, pageNum, bx0, by0, bx1, by1, newText);
       close();
-      setOutputBlob(result, 'edited.pdf');
-      const url = URL.createObjectURL(result);
+      // Mettre à jour inputBlob pour que les éditions suivantes s'accumulent
+      inputBlob = new File([result], src?.name || 'edited.pdf', { type: 'application/pdf' });
+      outputBlob = null;
+      setOutputBlob(inputBlob, inputBlob.name);
+      const url = URL.createObjectURL(inputBlob);
       showChainPill();
-      addToHistory({ label:'Édition texte', inputName:src?.name||'fichier.pdf', outputName:'edited.pdf', blob:result, url, ts:Date.now() });
-      toast('Texte modifié', 'Résultat prêt', 'ok', 4000);
-      // Re-rendre l'aperçu avec le PDF modifié pour voir le changement immédiatement
-      await renderPDF(result);
+      addToHistory({ label:'Édition texte', inputName:src?.name||'fichier.pdf', outputName:'edited.pdf', blob:inputBlob, url, ts:Date.now() });
+      toast('Texte modifié', '', 'ok', 3000);
+      // Recharger le PDF et rester sur la même page avec le même zoom
+      const savedPage = previewPage;
+      const savedZoom = previewZoom;
+      const doc = await pdfjsLib.getDocument({ data: await inputBlob.arrayBuffer() }).promise;
+      previewDoc = doc;
+      previewPage = Math.min(savedPage, doc.numPages);
+      previewZoom = savedZoom;
+      updatePageControls();
+      await renderPage(previewPage);
+      updateSidebarActive(previewPage);
     } catch (err) {
       // Revert to editable state on error
       done = false;
