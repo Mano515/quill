@@ -282,8 +282,8 @@
     .text-layer.edit-active span.tl-loading { background:rgba(108,99,255,.28) !important;pointer-events:none;outline:2px dashed var(--accent);outline-offset:2px; }
 
     /* ── Floating toolbar ── */
-    .text-editor-toolbar { position:absolute;z-index:60;background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.5),0 0 0 1px rgba(108,99,255,.15);font-size:12px;color:var(--text);white-space:nowrap;transform:translateY(calc(-100% - 8px));animation:tet-in .15s ease both;pointer-events:all; }
-    @keyframes tet-in { from{opacity:0;transform:translateY(calc(-100% - 3px)) scale(.95)} to{opacity:1;transform:translateY(calc(-100% - 8px))} }
+    .text-editor-toolbar { position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.5),0 0 0 1px rgba(108,99,255,.15);font-size:12px;color:var(--text);white-space:nowrap;animation:tet-in .15s ease both;pointer-events:all; }
+    @keyframes tet-in { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
     .tet-info { color:var(--dim);font-size:11px;font-family:monospace; }
     .tet-sep { width:1px;height:14px;background:var(--border);flex-shrink:0; }
     .tet-hint { font-size:10px;color:var(--dim); }
@@ -293,11 +293,89 @@
     .tet-confirm { color:var(--ok); }
     .tet-confirm:hover:not(:disabled) { background:rgba(74,222,128,.1) !important;border-color:var(--ok) !important; }
     .tet-cancel { color:var(--err); }
+    .tet-bold.active { background:var(--accent);color:#fff;border-color:var(--accent); }
     .tet-cancel:hover:not(:disabled) { background:rgba(248,113,113,.1) !important;border-color:var(--err) !important; }
 
     /* ── Inline editor (contenteditable) ── */
     .inline-editor { position:absolute;z-index:50;background:rgba(255,255,255,.97);color:#1a1a2e;border:2px solid var(--accent);border-radius:3px;padding:1px 5px;outline:none;white-space:pre;overflow:visible;box-shadow:0 0 0 4px rgba(108,99,255,.18),0 4px 20px rgba(0,0,0,.35);cursor:text;animation:editor-in .12s ease both;min-width:40px;line-height:1.4; }
     @keyframes editor-in { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      /* Bloquer tout débordement horizontal */
+      html, body { overflow-x:hidden;max-width:100vw; }
+      #app { overflow-x:hidden;max-width:100vw; }
+
+      /* Login */
+      .login-box { width:90vw;max-width:360px;padding:32px 20px; }
+
+      /* Header : compact, masquer éléments non essentiels */
+      .hdr-search { display:none; }
+      .kbd { display:none; }
+      .key-badge { display:none; }
+      header { padding:8px 12px;gap:8px;flex-wrap:wrap; }
+      .logout-btn { padding:6px 10px;font-size:12px; }
+
+      /* Layout : flex vertical — nav masquée, main + preview empilés */
+      .layout, .layout.has-sidebar, .layout.home-mode, .layout.home-mode.has-sidebar {
+        display:flex !important;flex-direction:column !important;
+        width:100%;overflow-x:hidden;
+      }
+      #history-sidebar { display:none !important; }
+
+      /* Nav (dans le drawer) toujours cachée dans le layout */
+      .layout > nav { display:none; }
+
+      /* Main */
+      main { padding:14px 12px;width:100%;box-sizing:border-box;overflow-x:hidden; }
+      .home-wrap { max-width:100%; }
+      .home-hero { padding:24px 14px; }
+      .quick-grid { grid-template-columns:repeat(2,1fr); }
+      .form-grid { max-width:100%; }
+
+      /* Preview panel : prend tout l'espace restant */
+      .preview-panel { border-left:none;border-top:1px solid var(--border);width:100%;min-height:50vh;flex:1; }
+      .preview-body { padding:10px 6px;align-items:stretch; }
+
+      /* Preview header : filename sur sa propre ligne, contrôles en dessous */
+      .preview-header { flex-wrap:wrap;padding:8px 10px;gap:6px; }
+      .preview-filename { width:100%;order:-1; }
+      #dl-btn { font-size:12px;padding:5px 10px; }
+      .page-controls { gap:4px; }
+      .page-controls button { min-height:36px;padding:4px 10px;font-size:14px; }
+      .edit-mode-btn { font-size:11px;padding:4px 8px; }
+
+      /* Canvas : ne jamais dépasser le viewport */
+      .canvas-wrap { max-width:calc(100vw - 12px);overflow:hidden;margin:0 auto; }
+      .canvas-wrap canvas { display:block;max-width:100%;height:auto; }
+
+      /* Toast & chain-pill : pas décalés par la sidebar */
+      #toast-container { right:12px;left:12px; }
+      #chain-pill { right:12px; }
+
+      /* Modaux */
+      .chain-modal { width:90vw; }
+      .chain-ops { grid-template-columns:1fr; }
+      .shortcuts-box { width:90vw; }
+
+      /* Toolbar flottante : scrollable horizontalement */
+      .text-editor-toolbar { max-width:calc(100vw - 16px);overflow-x:auto; }
+
+      /* Cibles tactiles ≥ 44 px */
+      .tet-btn { min-height:44px;padding:8px 12px;font-size:14px; }
+      button.submit { padding:14px 20px; }
+      .burger-btn { min-height:40px; }
+      .page-controls button { min-height:36px;padding:6px 10px; }
+
+      /* Drawer pleine largeur, contenu adapté */
+      #tools-drawer { width:100%;top:0; }
+      #tools-drawer .drawer-inner { padding:16px 14px; }
+      #tools-drawer .quick-grid { grid-template-columns:repeat(2,1fr) !important; }
+      #tools-drawer .home-section-title { font-size:11px; }
+      #tools-drawer .quick-card { padding:12px 8px; }
+      #tools-drawer .quick-card .qc-icon { font-size:20px;margin-bottom:5px; }
+      #tools-drawer .quick-card .qc-label { font-size:11px; }
+    }
   </style>
 </head>
 <body>
@@ -428,7 +506,7 @@
   <div class="drawer-inner">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <span style="font-size:13px;font-weight:700;color:var(--dim);letter-spacing:.8px;text-transform:uppercase">Outils</span>
-      <button onclick="closeDrawer()" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px" title="Fermer">✕</button>
+      <button id="drawer-close-btn" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:6px 10px;border-radius:6px;min-width:36px;min-height:36px" title="Fermer">✕</button>
     </div>
     <div class="home-section-title">Opérations rapides</div>
     <div class="quick-grid" id="quick-grid" style="grid-template-columns:repeat(3,1fr)"></div>
@@ -1002,22 +1080,107 @@ async function renderPage(num) {
     tl.className = 'text-layer edit-active';
     tl.style.cssText = `position:absolute;top:0;left:0;width:${vp.width}px;height:${vp.height}px;overflow:visible;`;
     wrap.appendChild(tl);
-    for (const item of textContent.items) {
-      if (!item.str || !item.str.trim()) continue;
-      // Applique la transformation viewport → coordonnées CSS
-      const mat = pdfjsLib.Util.transform(vp.transform, item.transform);
-      const cx = mat[4];         // x CSS du début de ligne (origine texte)
-      const cy = mat[5];         // y CSS de la baseline
-      // Math.hypot(mat[2], mat[3]) = norme de la 2e colonne = hauteur réelle pour tout angle de rotation
-      const fontH  = Math.hypot(mat[2], mat[3]);
-      // Filtrer en points PDF (= fontH / scale) plutôt qu'en pixels CSS,
-      // sinon les PDFs Figma (page >1000pt) filtrent tout à cause du zoom faible.
-      const fontPt = fontH / vp.scale;
-      if (fontPt < 3) continue;
-      const wPx = Math.max((item.width || 0) * vp.scale, 4);
+
+    // Collecte les spans bruts avant fusion.
+    // PyMuPDF est toujours essayé en premier : il gère les PDFs Figma (polices
+    // invalides) ET les PDFs édités (où PDF.js trouverait un mix de texte
+    // Figma mal positionné + texte Helvetica inséré, rendant la text layer
+    // incohérente et bloquant les ré-éditions).
+    // PDF.js n'est utilisé qu'en dernier recours si PyMuPDF retourne 0 spans.
+    const rawSpans = [];
+
+    const src = outputBlob || inputBlob;
+    if (src) {
+      const fd = new FormData();
+      fd.append('file', src, src.name || 'input.pdf');
+      fd.append('page', num);
+      const resp = await fetch('/edit/text-spans', {
+        method: 'POST',
+        headers: { 'X-API-Key': API_KEY },
+        body: fd,
+      }).catch(() => null);
+      if (resp?.ok) {
+        const { spans } = await resp.json();
+        for (const s of spans) {
+          // Coordonnées PyMuPDF (top-down, points) → pixels CSS
+          const cssL = s.x0 * vp.scale;
+          const cssT = s.y0 * vp.scale;
+          const cssW = Math.max((s.x1 - s.x0) * vp.scale, 4);
+          const cssH = (s.y1 - s.y0) * vp.scale;
+          rawSpans.push({ text: s.text, l: cssL, t: cssT, w: cssW, h: cssH });
+        }
+      }
+    }
+
+    // Fallback PDF.js uniquement si PyMuPDF n'a rien retourné
+    if (rawSpans.length === 0 && textContent.items.length > 0) {
+      for (const item of textContent.items) {
+        if (!item.str || !item.str.trim()) continue;
+        const mat   = pdfjsLib.Util.transform(vp.transform, item.transform);
+        const cx    = mat[4];
+        const cy    = mat[5];
+        const fontH = Math.hypot(mat[2], mat[3]);
+        if (fontH / vp.scale < 3) continue;
+        const wPx   = Math.max((item.width || 0) * vp.scale, 4);
+        rawSpans.push({ text: item.str, l: cx, t: cy - fontH, w: wPx, h: fontH });
+      }
+    }
+
+    // ── Groupement en lignes typographiques ──────────────────────────────────
+    // Compare le bord BAS de chaque span (t + h = bottom) plutôt que le centre.
+    // Les spans sur la même ligne partagent la même baseline → bords bas proches.
+    // Après une édition, le texte Helvetica inséré a des métriques différentes
+    // (descenders plus marqués) : comparer les centres confondait la ligne éditée
+    // avec la ligne suivante ; comparer les bords bas est bien plus robuste.
+    const lineGroups = [];
+    for (const s of rawSpans) {
+      const bot = s.t + s.h;
+      let placed = false;
+      for (const grp of lineGroups) {
+        if (Math.abs(bot - grp.bot) < Math.max(s.h, grp.h) * 0.35) {
+          grp.spans.push(s);
+          grp.bot = grp.bot + (bot - grp.bot) / grp.spans.length;
+          grp.h   = Math.max(grp.h, s.h);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) lineGroups.push({ bot, h: s.h, spans: [s] });
+    }
+
+    // ── Merge horizontal au sein de chaque ligne ──────────────────────────────
+    // Deux spans sont fusionnés si le gap horizontal < 2× hauteur de la ligne.
+    // Un espace est inséré si le gap correspond à un espace typographique (> 0,2× h).
+    const mergedSpans = [];
+    for (const grp of lineGroups) {
+      grp.spans.sort((a, b) => a.l - b.l);
+      let cur = null;
+      for (const s of grp.spans) {
+        if (!cur) { cur = { ...s }; continue; }
+        const gap = s.l - (cur.l + cur.w);
+        if (gap < Math.max(s.h, cur.h) * 2) {
+          if (gap > Math.max(s.h, cur.h) * 0.2) cur.text += ' ';
+          cur.text += s.text;
+          cur.w = (s.l + s.w) - cur.l;
+          cur.h = Math.max(cur.h, s.h);
+          // Ajuste le top au minimum (point le plus haut des deux spans)
+          const newT = Math.min(cur.t, s.t);
+          cur.h = Math.max(cur.t + cur.h, s.t + s.h) - newT;
+          cur.t = newT;
+        } else {
+          mergedSpans.push(cur);
+          cur = { ...s };
+        }
+      }
+      if (cur) mergedSpans.push(cur);
+    }
+
+    // Crée un span cliquable par groupe fusionné
+    for (const m of mergedSpans) {
+      if (m.h < 1) continue;
       const span = document.createElement('span');
-      span.textContent = item.str;
-      span.style.cssText = `position:absolute;left:${cx}px;top:${cy - fontH}px;width:${wPx}px;height:${fontH}px;font-size:${fontH}px;color:transparent;white-space:pre;pointer-events:auto;cursor:text;line-height:1;`;
+      span.textContent = m.text;
+      span.style.cssText = `position:absolute;left:${m.l}px;top:${m.t}px;width:${m.w}px;height:${m.h}px;font-size:${m.h}px;color:transparent;white-space:pre;pointer-events:auto;cursor:text;line-height:1;`;
       span.onclick = e => { e.stopPropagation(); showInlineEditor(wrap, span, vp, num); };
       tl.appendChild(span);
     }
@@ -1155,69 +1318,100 @@ function showPlaceholder(msg, homeMode=false) {
 
 // ── Inline text editor ────────────────────────────────────────────────────
 function showInlineEditor(wrap, span, vp, pageNum) {
-  // Close any existing editor
   wrap.querySelector('.inline-editor')?.remove();
-  wrap.querySelector('.text-editor-toolbar')?.remove();
-  wrap.querySelectorAll('.tl-selected').forEach(s => s.classList.remove('tl-selected'));
-
+  document.querySelector('.text-editor-toolbar')?.remove();
+  wrap.querySelectorAll('.tl-selected').forEach(el => el.classList.remove('tl-selected'));
   span.classList.add('tl-selected');
 
+  // Coordonnées CSS du span dans la page
   const wrapRect = wrap.getBoundingClientRect();
   const spanRect = span.getBoundingClientRect();
   const cssX = spanRect.left - wrapRect.left;
-  const cssY = spanRect.top - wrapRect.top;
-  const cssW = Math.max(spanRect.width, 40);
+  const cssY = spanRect.top  - wrapRect.top;
+  const cssW = Math.max(spanRect.width,  40);
   const cssH = Math.max(spanRect.height, 14);
 
-  // Convert CSS pixels → PyMuPDF coordinates.
-  // For a standard (unrotated) page: mupdfX = cssX / scale, mupdfY = cssY / scale.
-  // This holds because CSS Y is already measured top-down, same as PyMuPDF.
-  const s = vp.scale;
+  // Conversion CSS → points PDF (envoyé au backend)
+  const scale  = vp.scale;
   const MARGIN = 3;
-  const bx0 = cssX / s - MARGIN;
-  const by0 = cssY / s - MARGIN;
-  const bx1 = (cssX + cssW) / s + MARGIN;
-  const by1 = (cssY + cssH) / s + MARGIN;
+  const bx0 = cssX / scale - MARGIN;
+  const by0 = cssY / scale - MARGIN;
+  const bx1 = (cssX + cssW) / scale + MARGIN;
+  const by1 = (cssY + cssH) / scale + MARGIN;
 
   const originalText = span.textContent;
-  const spanStyle = getComputedStyle(span);
-  const fontSize_css = parseFloat(spanStyle.fontSize) || 12;
-  const fontSize_pt = Math.round(fontSize_css / s);
+  const fontSize_css = parseFloat(getComputedStyle(span).fontSize) || 12;
+  const fontSize_pt  = Math.round(fontSize_css / scale);
+
+  // Paramètres envoyés au backend
+  let tracking = 0;   // points PDF supplémentaires entre chaque lettre
+  let weight   = 0;   // fraction du corps (0.01 = 1% de font_size)
 
   // ── Toolbar ──
   const toolbar = document.createElement('div');
   toolbar.className = 'text-editor-toolbar';
-  toolbar.style.left = cssX + 'px';
-  toolbar.style.top  = cssY + 'px';
   toolbar.innerHTML = `
     <span class="tet-info">${fontSize_pt}pt</span>
     <span class="tet-sep"></span>
-    <span class="tet-hint">Entrée&nbsp;=&nbsp;✓&nbsp;&nbsp;Échap&nbsp;=&nbsp;✗</span>
+    <span class="tet-info" style="font-size:10px;color:var(--dim)">Gr.</span>
+    <button class="tet-btn tet-wdec" style="min-width:30px;padding:5px 10px;font-size:15px;">−</button>
+    <span class="tet-wval tet-info" style="min-width:32px;text-align:center">0</span>
+    <button class="tet-btn tet-winc" style="min-width:30px;padding:5px 10px;font-size:15px;">+</button>
     <span class="tet-sep"></span>
-    <button class="tet-btn tet-confirm">✓ Confirmer</button>
-    <button class="tet-btn tet-cancel">✗ Annuler</button>`;
-  wrap.appendChild(toolbar);
+    <span class="tet-info">A↔</span>
+    <button class="tet-btn tet-tdec" style="min-width:30px;padding:5px 10px;font-size:15px;">−</button>
+    <span class="tet-tval tet-info" style="min-width:32px;text-align:center">0</span>
+    <button class="tet-btn tet-tinc" style="min-width:30px;padding:5px 10px;font-size:15px;">+</button>
+    <span class="tet-sep"></span>
+    <button class="tet-btn tet-confirm">✓</button>
+    <button class="tet-btn tet-cancel" style="color:var(--err)">✗</button>`;
+  // Position fixe (viewport) pour ne jamais être coupée par overflow:hidden du canvas-wrap
+  document.body.appendChild(toolbar);
+  const positionToolbar = () => {
+    const spanR = span.getBoundingClientRect();
+    toolbar.style.left = spanR.left + 'px';
+    toolbar.style.top  = spanR.top + 'px';  // sera ajusté après mesure
+    requestAnimationFrame(() => {
+      const tbH = toolbar.offsetHeight;
+      const above = spanR.top - tbH - 8;
+      toolbar.style.top = (above >= 8 ? above : spanR.bottom + 8) + 'px';
+    });
+  };
+  positionToolbar();
 
-  // ── Contenteditable editor ──
+  const fmt  = v => (v > 0 ? '+' : '') + v;
+  const wVal = toolbar.querySelector('.tet-wval');
+  const tVal = toolbar.querySelector('.tet-tval');
+
+  // tracking en points PDF → em (relatif à la taille, indépendant de l'échelle viewport)
+  // weight → font-weight CSS + léger text-shadow pour affiner (simule Helvetica Bold + stroke)
+  const applyPreview = () => {
+    editor.style.fontFamily   = 'Helvetica, Arial, sans-serif';
+    editor.style.fontWeight   = weight > 0 ? 'bold' : 'normal';
+    const extraShadow = Math.max(0, weight - 0.04) * scale;
+    editor.style.textShadow   = extraShadow > 0
+      ? `0 0 ${extraShadow}px currentColor` : '';
+    editor.style.letterSpacing = tracking !== 0
+      ? `${tracking / fontSize_pt * 0.5}em` : '';
+  };
+
+  toolbar.querySelector('.tet-wdec').onclick = () => { weight   = Math.round((weight   - 0.02) * 100) / 100; wVal.textContent = fmt(weight);   applyPreview(); };
+  toolbar.querySelector('.tet-winc').onclick = () => { weight   = Math.round((weight   + 0.02) * 100) / 100; wVal.textContent = fmt(weight);   applyPreview(); };
+  toolbar.querySelector('.tet-tdec').onclick = () => { tracking = Math.round((tracking - 0.2)  * 10)  / 10;  tVal.textContent = fmt(tracking); applyPreview(); };
+  toolbar.querySelector('.tet-tinc').onclick = () => { tracking = Math.round((tracking + 0.2)  * 10)  / 10;  tVal.textContent = fmt(tracking); applyPreview(); };
+
+  // ── Éditeur ──
   const editor = document.createElement('div');
   editor.className = 'inline-editor';
   editor.contentEditable = 'true';
   editor.textContent = originalText;
-  editor.style.left     = cssX + 'px';
-  editor.style.top      = cssY + 'px';
-  editor.style.minWidth = cssW + 'px';
-  editor.style.minHeight= cssH + 'px';
-  editor.style.fontSize = fontSize_css + 'px';
-  editor.style.lineHeight = spanStyle.lineHeight;
+  editor.style.left      = cssX + 'px';
+  editor.style.top       = cssY + 'px';
+  editor.style.minWidth  = cssW + 'px';
+  editor.style.minHeight = cssH + 'px';
+  editor.style.fontSize  = fontSize_css + 'px';
   wrap.appendChild(editor);
-
-  // Focus and select all text
-  editor.focus();
-  const rng = document.createRange();
-  rng.selectNodeContents(editor);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(rng);
+  requestAnimationFrame(() => editor.focus());
 
   const getText = () => (editor.innerText || '').replace(/[\r\n]+$/, '').trim();
 
@@ -1236,74 +1430,57 @@ function showInlineEditor(wrap, span, vp, pageNum) {
   const commit = async () => {
     if (done) return;
     const newText = getText();
-    if (!newText || newText === originalText) { close(); return; }
+    if (!newText) { close(); return; }
+    if (newText === originalText && tracking === 0 && weight === 0) { close(); return; }
     done = true;
     document.removeEventListener('mousedown', onOutside, true);
 
-    // Loading state
     editor.contentEditable = 'false';
-    editor.style.opacity = '0.55';
-    toolbar.innerHTML = `<span class="tet-info">Enregistrement…</span>
-      <span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(108,99,255,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite"></span>`;
+    editor.style.opacity = '0.5';
+    toolbar.innerHTML = '<span class="tet-info">Enregistrement…</span>';
     span.classList.add('tl-loading');
-    span.classList.remove('tl-selected');
 
     try {
       const src = outputBlob || inputBlob;
       if (!src) throw new Error('Aucun fichier chargé');
-      console.log('[edit] commit', { pageNum, bx0, by0, bx1, by1, newText, src: src?.name, size: src?.size });
-      const result = await callReplaceText(src, pageNum, bx0, by0, bx1, by1, newText);
-      console.log('[edit] result ok, size=', result?.size);
+      const result = await callReplaceText(src, pageNum, bx0, by0, bx1, by1, newText, tracking, weight);
       close();
-      // Mettre à jour inputBlob pour que les éditions suivantes s'accumulent
-      inputBlob = new File([result], src?.name || 'edited.pdf', { type: 'application/pdf' });
+      inputBlob = new File([result], src.name || 'edited.pdf', { type: 'application/pdf' });
       outputBlob = null;
       setOutputBlob(inputBlob, inputBlob.name);
-      const url = URL.createObjectURL(inputBlob);
+      addToHistory({ label:'Édition texte', inputName:src.name||'fichier.pdf', outputName:'edited.pdf', blob:inputBlob, url:URL.createObjectURL(inputBlob), ts:Date.now() });
       showChainPill();
-      addToHistory({ label:'Édition texte', inputName:src?.name||'fichier.pdf', outputName:'edited.pdf', blob:inputBlob, url, ts:Date.now() });
       toast('Texte modifié', '', 'ok', 3000);
-      // Recharger le PDF et rester sur la même page avec le même zoom
-      const savedPage = previewPage;
-      const savedZoom = previewZoom;
-      console.log('[edit] re-rendering page', savedPage, 'zoom', savedZoom);
-      const doc = await pdfjsLib.getDocument({ data: await inputBlob.arrayBuffer() }).promise;
-      previewDoc = doc;
-      previewPage = Math.min(savedPage, doc.numPages);
+      const savedPage = previewPage, savedZoom = previewZoom;
+      previewDoc  = await pdfjsLib.getDocument({ data: await inputBlob.arrayBuffer() }).promise;
+      previewPage = Math.min(savedPage, previewDoc.numPages);
       previewZoom = savedZoom;
       updatePageControls();
       await renderPage(previewPage);
-      console.log('[edit] renderPage done');
       updateSidebarActive(previewPage);
     } catch (err) {
-      console.error('[edit] error in commit:', err);
-      // Revert to editable state on error
       done = false;
       editor.contentEditable = 'true';
       editor.style.opacity = '1';
       span.classList.remove('tl-loading');
       span.classList.add('tl-selected');
-      toolbar.innerHTML = `
-        <span class="tet-info" style="color:var(--err)">${err.message.substring(0,50)}</span>
-        <span class="tet-sep"></span>
-        <button class="tet-btn tet-confirm">✓ Réessayer</button>
-        <button class="tet-btn tet-cancel">✗ Annuler</button>`;
+      toolbar.innerHTML = `<span class="tet-info" style="color:var(--err)">${err.message.slice(0,50)}</span>
+        <button class="tet-btn tet-confirm">↺ Réessayer</button>
+        <button class="tet-btn tet-cancel" style="color:var(--err)">✗</button>`;
       toolbar.querySelector('.tet-confirm').onclick = () => { done = false; commit(); };
-      toolbar.querySelector('.tet-cancel').onclick = cancel;
+      toolbar.querySelector('.tet-cancel').onclick  = cancel;
       editor.focus();
       document.addEventListener('mousedown', onOutside, true);
     }
   };
 
-  toolbar.querySelector('.tet-confirm').onclick = () => commit();
-  toolbar.querySelector('.tet-cancel').onclick = cancel;
-
+  toolbar.querySelector('.tet-confirm').onclick = commit;
+  toolbar.querySelector('.tet-cancel').onclick  = cancel;
   editor.addEventListener('keydown', e => {
     if (e.key === 'Escape') { e.preventDefault(); cancel(); }
     else if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
   });
 
-  // Click outside → commit
   const onOutside = e => {
     if (!editor.contains(e.target) && !toolbar.contains(e.target) && !span.contains(e.target)) {
       document.removeEventListener('mousedown', onOutside, true);
@@ -1313,15 +1490,17 @@ function showInlineEditor(wrap, span, vp, pageNum) {
   setTimeout(() => document.addEventListener('mousedown', onOutside, true), 150);
 }
 
-async function callReplaceText(blob, page, x0, y0, x1, y1, newText) {
+async function callReplaceText(blob, page, x0, y0, x1, y1, newText, tracking = 0, weightExtra = 0) {
   const fd = new FormData();
-  fd.append('file', blob, blob.name||'input.pdf');
-  fd.append('page',     page);
-  fd.append('x0',      x0);
-  fd.append('y0',      y0);
-  fd.append('x1',      x1);
-  fd.append('y1',      y1);
-  fd.append('new_text', newText);
+  fd.append('file',         blob, blob.name || 'input.pdf');
+  fd.append('page',         page);
+  fd.append('x0',           x0);
+  fd.append('y0',           y0);
+  fd.append('x1',           x1);
+  fd.append('y1',           y1);
+  fd.append('new_text',     newText);
+  fd.append('tracking',     tracking * 2);
+  fd.append('weight_extra', weightExtra);
   const resp = await fetch('/edit/replace-text', {
     method: 'POST',
     headers: { 'X-API-Key': API_KEY },
@@ -1521,6 +1700,7 @@ function closeDrawer(){
 }
 document.getElementById('burger-btn').onclick = openDrawer;
 document.getElementById('drawer-backdrop').onclick = closeDrawer;
+document.getElementById('drawer-close-btn').onclick = closeDrawer;
 
 // ── Navigation ────────────────────────────────────────────────────────────
 function activate(id){
